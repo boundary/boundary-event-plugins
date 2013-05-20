@@ -27,21 +27,33 @@ BOUNDARY_API_HOST = "api.boundary.com"
 PINGDOM_API_HOST = "api.pingdom.com"
 CACERT_PATH = "#{File.dirname(__FILE__)}/../common/cacert.pem"
 
+# CONFIGURATIONS
+
+BOUNDARY_ORGID = ""
+BOUNDARY_APIKEY = ""
+PINGDOM_USERNAME = ""
+PINGDOM_PASSWORD = ""
+PINGDOM_APPKEY = ""
+
+
+POLLING_PERIOD = 60
+
+
 class BoundaryEvents
 
   #
   # Some of this code was borrowed from https://github.com/portertech/chef-irc-snitch
   #
 
-  def initialize(options)
-    @boundary_orgid = options[:orgid]
-    @boundary_apikey = options[:apikey]
-    @pingdom_username = options[:username]
-    @pingdom_password = options[:password]
-    @pingdom_appkey = options[:appkey]
-    @polling_period = options[:pollingperiod]
+  def initialize()
+    @boundary_orgid = BOUNDARY_ORGID
+    @boundary_apikey = BOUNDARY_APIKEY
+    @pingdom_username = PINGDOM_USERNAME
+    @pingdom_password = PINGDOM_PASSWORD
+    @pingdom_appkey = PINGDOM_APPKEY
+    @polling_period = POLLING_PERIOD
+    t=Time.now
     @epoch = Time.now.to_i - @polling_period # here we poll once a minute, so we take EPOCH minus 60 seconds as beginning of our polling period
-
   end
 
   def poll_pingdom_alerts
@@ -52,8 +64,10 @@ class BoundaryEvents
     myjson =  JSON.parse(response.body)
     new_events = Array.new
     myjson["checks"].each do |check|
+      print check
       check_time = check["created"].to_i
       if check_time > @epoch   # check if this is a fresh alert
+        print check 
         evt = event_parse(check)
         new_events.push(evt)
       end
@@ -63,7 +77,7 @@ class BoundaryEvents
   end
 
   def event_parse(check)
-    #not sure what to use here.. different pingdom statuses are "up","down","unconfirmed_down","unknown","paused"
+    # different pingdom statuses are "up","down","unconfirmed_down","unknown","paused"
     #so we may need to adjust status and severity accordingly
     event = {
       :title => "Pingdom Check Failure",
@@ -73,13 +87,19 @@ class BoundaryEvents
       :message => "Pingdom Check for " + check["name"] + " | status=" + check["status"],
       :source => {
         :ref => check["hostname"],
-        :type => "Pingdom"
+        :type => "meter"
+      },
+      :sender => {
+                   :ref => "Pingdom",
+                   :type => "Pingdom"
       },
       :properties => {
         :eventKey => "Pingdom-check",
-        :starttime => check["lasttesttime"]
+        :starttime => check["lasttesttime"],
+	:sender => "Pingdom",
+        :source => check["hostname"]
       },
-      :fingerprintFields => ["eventKey"]
+      :fingerprintFields => ["source","sender"]
     }
 
     return event
@@ -119,7 +139,7 @@ class BoundaryEvents
         end
       end
     rescue Timeout::Error
-      Chef::Log.error("Timed out while attempting to create Boundary Event")
+      print "Timed out while attempting to create Boundary Event"
     end
   end
 
@@ -139,3 +159,7 @@ class BoundaryEvents
   end
 
 end
+
+
+boundary_event = BoundaryEvents.new
+boundary_event.report
