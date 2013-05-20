@@ -26,6 +26,7 @@ require "uri"
 require "yaml"
 
 BOUNDARY_API_HOST = "api.boundary.com"
+BOUNDARY_CONFIG_PATH = "/etc/nagios3/boundary.yml"
 CACERT_PATH = "#{File.dirname(__FILE__)}/../common/cacert.pem"
 
 def load_config(path)
@@ -121,7 +122,7 @@ end
 
 options = {}
 
-options[:config] = "/etc/nagios3/boundary-event-handler.yml"
+options[:config] = BOUNDARY_CONFIG_PATH
 
 OptionParser.new do |opts|
   opts.on("-c", "--config CONFIG", "Config file") { |c| options[:config] = c }
