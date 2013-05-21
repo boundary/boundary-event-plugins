@@ -5,13 +5,13 @@ Pingdom Boundary Events Handler
 - Posts these checks out to Boundary Events Console
 
 Configuration:
-1. Be sure to have the cacert.pem file, this is required for encryption.
-2. Edit Boundary variables BOUNDARY_ORGID and BOUNDARY_APIKEY
+- Be sure to have the cacert.pem file, this is required for encryption.
+- Edit Boundary variables BOUNDARY_ORGID and BOUNDARY_APIKEY
       - These can be found in Boundary under Configure > Organization
-3. Edit Pingdom variables PINGDOM_USERNAME, PINGDOM_PASSWORD, and PINGDOM_APPKEY
+- Edit Pingdom variables PINGDOM_USERNAME, PINGDOM_PASSWORD, and PINGDOM_APPKEY
       - Username and Password are your Pingdom logons
       - AppKey can be found on the Pingdom API Access Page
-4. Decide on the Polling period
+- Decide on the Polling period
       - Polling Period decides the frequency of checking Pingdom API for new alerts
       - If you plan on scheduling to run the Pingdom-Boundary-Events-Handler periodically, the polling period variable should match the frequency of your scheduled runs
 
