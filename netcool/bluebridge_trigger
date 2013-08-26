@@ -1,0 +1,7 @@
+begin
+        for each row bbe in alerts.status where bbe.Grade < 2 and bbe.LastOccurrence >= ( getdate() - (60*30) )
+        begin
+                execute bluebridge_proc (bbe.Summary, bbe.Node, bbe.Severity, bbe.Identifier, bbe.Serial, bbe.ServerName);
+                update alerts.status via bbe.Identifier set Grade=2;
+        end;
+end
