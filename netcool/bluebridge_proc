@@ -1,0 +1,14 @@
+Parameters:
+  in summary Char(1)
+  in node Char(1)
+  in severity integer
+  in identifier Char(1)
+  in serial integer
+  in servername Char(1)
+
+
+Executable: 
+$OMNIHOME/utils/bluebridge.sh
+
+Arguments: 
+'\''+summary+'\'','\''+node+'\'',severity,'\''+identifier+'\'',serial,'\''+servername+'\''
