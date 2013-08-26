@@ -6,7 +6,7 @@ This integration is instrumented as a combination of:
 - 1 Netcool objectserver external procedure `bluebridge_proc`
 - 1 BASH script `bluebridge.sh` which uses the [Event REST API](https://app.boundary.com/docs/events_api) to create events in [Boundary](https://app.boundary.com).
 
-The `bluebridge_trigger` executes on a configured interval (typically every 1-5 minutes), identifies new alerts which haven't been sent to Boundary yet and passes the core alert fields to the `bluebridge_proc` external procedure which calls the `bluebridge.sh` script.
+`bluebridge_trigger` executes on a configured interval (typically every 1-5 minutes), identifies new alerts which haven't been sent to Boundary yet and passes the core alert fields to the `bluebridge_proc` external procedure which calls the `bluebridge.sh` script.
 
 `bluebridge.sh` currently processes only the core alerts.status fields of:
 Summary, Severity, Node, Identifier, Serial, ServerName
