@@ -7,7 +7,7 @@ Requirements
 ---
 
 - Ruby
-- Your Nagios server is running bprobe.
+- Boundary API SSL CA certificate, located here: [cacert.pem] (https://github.com/boundary/boundary-event-plugins/tree/master/common) 
 
 Setup
 ---
