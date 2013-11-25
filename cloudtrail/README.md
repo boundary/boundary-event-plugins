@@ -31,4 +31,4 @@ api-key = [Boundary User API Key]
 
 To retrieve your Boundary ORG ID and API Key, while logged int Boundary go to: Organization->Organization Settings
 
-Note that once everything is configured it may take a few minutes to popu
+Note that once everything is configured it may take a few minutes to populate the Boundary Events Console as Amazon CloutTrail operates on five minute intervals.
