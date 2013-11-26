@@ -136,10 +136,13 @@ def build_event(filename):
         account = userid["accountId"]
         eventtime = item["eventTime"]
 
-        agent = item["userAgent"]
-        if len(agent) > 20: 
-            lst = agent.split('/')
-            agent = lst[0]
+	agent = "NotIAMAccount"
+        if "userAgent" in item:
+	    agent = item["userAgent"]
+
+            if len(agent) > 20: 
+                lst = agent.split('/')
+                agent = lst[0]
  
         username = "sampleIAMuser"
         if "userName" in userid:
