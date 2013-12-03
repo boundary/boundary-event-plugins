@@ -6,10 +6,7 @@
 #Reason: 
 
 
-
 import sys
-from random import choice
-import random
 import time
 import pprint
 import gzip
@@ -19,19 +16,15 @@ import json
 import urllib2
 import base64
 import os
-from optparse import OptionParser
 import ConfigParser
-import datetime
-
-__all__ = [ 'main', ]
 
 config = ConfigParser.RawConfigParser()
-config.read('boundary-cloudtrail.cfg')
+config.read(os.path.join(os.path.dirname(__file__), 'boundary-cloudtrail.cfg'))
 
 #Boundary Variables
-API_URL=config.get('boundary', 'api-url')
-ORG_ID=config.get('boundary', 'org-id')
-API_KEY=config.get('boundary', 'api-key')
+API_URL = config.get('boundary', 'api-url')
+ORG_ID = config.get('boundary', 'org-id')
+API_KEY = config.get('boundary', 'api-key')
 
 #AWS Variables
 AWS_TMP_PATH = config.get('cloudtrail', 'tmp-path')
@@ -39,6 +32,7 @@ AWS_ID = config.get('cloudtrail', 'access-key-id')
 AWS_KEY = config.get('cloudtrail', 'secret-access-key')
 AWS_ZONE = config.get('cloudtrail', 'availability-zone')
 SQS_QUEUE = config.get('cloudtrail', 'sqs-queue-name')
+
 
 def process_queue():
     conn = boto.sqs.connect_to_region(AWS_ZONE, aws_access_key_id=AWS_ID, aws_secret_access_key=AWS_KEY)
@@ -53,19 +47,20 @@ def process_queue():
         rs = queue.get_messages()
         message = rs[0]
         json_body = json.loads(message.get_body())
-        pprint.pprint (json_body)
+        pprint.pprint(json_body)
 
         if 's3Bucket' in json_body.keys():
-          bname = json.dumps(json_body["s3Bucket"])
-          bname = bname.strip('"')
+            bname = json.dumps(json_body["s3Bucket"])
+            bname = bname.strip('"')
 
-          okpath = json.dumps(json_body["s3ObjectKey"][0])
-          okpath = okpath.strip('"')
+            okpath = json.dumps(json_body["s3ObjectKey"][0])
+            okpath = okpath.strip('"')
 
-          filename = dl_file(bname, okpath)
-          build_event(filename)
+            filename = dl_file(bname, okpath)
+            build_event(filename)
 
-          queue.delete_message(message)
+            queue.delete_message(message)
+
 
 def dl_file(bname, okpath):
     print bname + ' ' + okpath
@@ -83,9 +78,11 @@ def dl_file(bname, okpath):
 
     return filename
 
+
 def encode_apikey(apikey):
-    b64_auth = base64.encodestring( ':'.join([apikey, ''])).replace('\n', '')
+    b64_auth = base64.encodestring(':'.join([apikey, ''])).replace('\n', '')
     return ' '.join(['Basic', b64_auth])
+
 
 def create_event(event):
     auth_header = encode_apikey(API_KEY)
@@ -99,17 +96,18 @@ def create_event(event):
     req = urllib2.Request(url, event_json, {'Content-type': 'application/json'})
     req.add_header('Authorization', auth_header)
 
-    response = urllib2.urlopen(req)
+    return urllib2.urlopen(req)
+
 
 def build_event(filename):
-    json_data=gzip.open(filename, 'rb')
+    json_data = gzip.open(filename, 'rb')
     data = json.load(json_data)
     json_data.close()
     os.remove(filename)
     slink = "https://console.aws.amazon.com/ec2/home?region=" + AWS_ZONE + "#s=SecurityGroups"
     awslink = "https://console.aws.amazon.com/console"
 
-    count=0
+    count = 0
 
     for item in data["Records"]:
         userid = item["userIdentity"]
@@ -118,27 +116,30 @@ def build_event(filename):
         rparams = str(pprint.pformat(rp_json))
         #pprint(userid)
 
-	title = "AWS CloudTrail - " + item["eventName"]
-	action = item["eventName"]
+        title = "AWS CloudTrail - " + item["eventName"]
+        action = item["eventName"]
 
         severity = "INFO"
-        if "Describe" not in action: severity = "WARN"
-        if "Revoke" in action: severity = "CRITICAL"
-        if "Authorize" in action: severity = "ERROR"
+        if "Describe" not in action:
+            severity = "WARN"
+        if "Revoke" in action:
+            severity = "CRITICAL"
+        if "Authorize" in action:
+            severity = "ERROR"
 
         region = item["awsRegion"]
         source = item["sourceIPAddress"]
         sender = "AWS CloudTrail"
-	status = "OK"
+        status = "OK"
         principal = userid["principalId"]
         utype = userid["type"]
         arn = userid["arn"]
         account = userid["accountId"]
         eventtime = item["eventTime"]
 
-	agent = "NotIAMAccount"
+        agent = "NotIAMAccount"
         if "userAgent" in item:
-	    agent = item["userAgent"]
+            agent = item["userAgent"]
 
             if len(agent) > 20: 
                 lst = agent.split('/')
@@ -148,10 +149,10 @@ def build_event(filename):
         if "userName" in userid:
             username = userid["userName"]
 
-        groupname=""
+        groupname = ""
         if "ipPermissions" in rparams:
-           #groupname = json.dumps(rparams["ipPermissions"][0]["groupName"])
-           groupname = json.dumps(rparams[0])
+            #groupname = json.dumps(rparams["ipPermissions"][0]["groupName"])
+            groupname = json.dumps(rparams[0])
 
         print "groupname >>" + groupname + "<<"
         message = item["eventName"] + " was executed on " \
@@ -163,37 +164,37 @@ def build_event(filename):
      
         if "Security" in action:
             event = {
-             'source': { "type": "host" , "ref" : source },
-             'sender': { "type": sender, "ref" : sender },
-             'properties' : { \
-                 "sender" : sender, "source" : source, "action" : action, \
-                 "agent" : agent, "accountid" : account, "username" : username, \
-                 "eventtime" : str(eventtime), "AWS Link" : [{"href":slink}]
-                 },
-             'title' : title,
-             'createdAt' : eventtime,
-             'message': message,
-             'severity': severity,
-             'status': status,
-             'tags': [ source, sender, severity, action, region, agent, account, username],
-             'fingerprintFields' : ['source','sender', 'action', 'username', 'eventtime']
+                'source': {"type": "host", "ref": source},
+                'sender': {"type": sender, "ref": sender},
+                'properties': {
+                    "sender": sender, "source": source, "action": action,
+                    "agent": agent, "accountid": account, "username": username,
+                    "eventtime": str(eventtime), "AWS Link": [{"href": slink}]
+                },
+                'title': title,
+                'createdAt': eventtime,
+                'message': message,
+                'severity': severity,
+                'status': status,
+                'tags': [source, sender, severity, action, region, agent, account, username],
+                'fingerprintFields': ['source', 'sender', 'action', 'username', 'eventtime']
             }
         else:
             event = {
-             'source': { "type": "host" , "ref" : source },
-             'sender': { "type": sender, "ref" : sender },
-             'properties' : { \
-                 "sender" : sender, "source" : source, "action" : action, \
-                 "agent" : agent, "accountid" : account, "username" : username, \
-                 "AWS Link" : [{"href":awslink}]
-                 },
-             'title' : title,
-             'createdAt' : eventtime,
-             'message': message,
-             'severity': severity,
-             'status': status,
-             'tags': [ source, sender, severity, action, region, agent, account, username],
-             'fingerprintFields' : ['source','sender', 'action', 'username']
+                'source': {"type": "host", "ref": source},
+                'sender': {"type": sender, "ref": sender},
+                'properties': {
+                    "sender": sender, "source": source, "action": action,
+                    "agent": agent, "accountid": account, "username": username,
+                    "AWS Link": [{"href": awslink}]
+                },
+                'title': title,
+                'createdAt': eventtime,
+                'message': message,
+                'severity': severity,
+                'status': status,
+                'tags': [source, sender, severity, action, region, agent, account, username],
+                'fingerprintFields': ['source', 'sender', 'action', 'username']
             }
 
         #pprint(event)
@@ -204,9 +205,10 @@ def build_event(filename):
 
         if count / 2 == 1:
             time.sleep(1) 
-            count=0
+            count = 0
 
     print "Processed AWS CloudTrail payload >>" + filename + "<<"
+
 
 def main():
     if len(sys.argv) > 1:
