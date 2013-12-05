@@ -1,0 +1,22 @@
+<!--
+Splunk App for Boundary API Configuration UI.
+
+Author:: Greg Albrecht <mailto:gba@splunk.com>
+Copyright:: Copyright 2012 Splunk, Inc.
+License:: Apache License 2.0
+-->
+
+
+<setup>
+  <block title="Boundary Integration" endpoint="boundary/boundary_api" entity="boundary">
+    <text>Please enter your Boundary API key and Organization ID.</text>
+    <input field="org_id">
+      <label>Organization ID</label>
+      <type>text</type>
+    </input>
+    <input field="api_key">
+      <label>API key</label>
+      <type>text</type>
+    </input>
+  </block>
+</setup>

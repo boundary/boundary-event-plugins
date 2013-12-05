@@ -1,0 +1,87 @@
+<h2 style="font-size: 32px;"><img src="/en-US/static/app/boundary/assets/BoundaryBrandMark.png" style="float: left; padding-right: 20px; padding-bottom: 20px;" align="left"/>Boundary Splunk App</h2>
+<div style="width: 800px; padding-right: 60px; border-right: 1px solid #ddd;">
+<p style="font-size: 16px;">Boundary enables customers to monitor and improve application performance. If you have business-critical services deployed in cloud or hybrid IT infrastructures, Boundary can help you ensure these services deliver optimal performance and uptime.</p>
+
+<p style="font-size: 16px;">The Boundary app for Splunk feeds information about app topology, latency, and app-to-app conversation information into your Splunk environment.</p>
+
+<table width="100%" style="border: 0; padding: 10px;">
+<tr>
+<td><img src="/en-US/static/app/boundary/assets/homeitopsbox1b.jpg" width="260"></td>
+<td><img src="/en-US/static/app/boundary/assets/homerealtimebox2.jpg" width="260"></td>
+<td><img src="/en-US/static/app/boundary/assets/homeitopsbox.jpg" width="260"></td>
+</table>
+
+<p style="font-size: 14px;">Unlike traditional application performance monitoring (APM) solutions, Boundary can monitor all the components that make up an application, regardless of the infrastructure or languages used. The solution automatically builds and updates a logical application topology and makes it fast and easy to identify the location and source of issues and bottlenecks. GitHub, Basho, Canonical, Yammer, Cloudant, and many other customers rely on Boundary solutions every day.</p>
+
+<p style="font-size: 14px;">For more information, please visit us at <a href="http://www.boundary.com">http://boundary.com/</a>.</p>
+<p>&nbsp;</p>
+<hr style="border: 1px solid #ddd; padding: 0;" />
+<p>&nbsp;</p>
+<h2 style="font-size: 24px">I. Getting Started</h2>
+<p style="font-size: 14px;">Configuring the Boundary Splunk app takes just a second.</p>
+<h2 style="font-size: 18px;">Adding Your Credentials</h2>
+<p style="font-size: 14px;">First, we'll need to grab your Boundary "Organization ID" and API key. You can find your organization ID and API key by logging in at http://app.boundary.com and clicking "Organization &raquo; Org Settings" at the top right.</p>
+<p style="font-size: 14px;">Once you've got it, head to Splunk's App Manager UI and choose the "Set Up" action for the Boundary app. Then, drop the API Key and Organizaton ID into the form and click Save.</p>
+<p style="text-align: center;"><img src="/en-US/static/app/boundary/assets/configuration.png" style="border: 1px solid #ccc; box-shadow: 0px 0px 3px #ccc;"></p>
+
+<p>&nbsp;</p>
+
+<h2 style="font-size: 18px;">And you're done!</h2>
+<p style="font-size: 14px;">With your configuration set and Splunk restarted, you're good to go!</p>
+
+<p style="font-size: 14px;">For support, please contact <a href="mailto:support@boundary.com">support@boundary.com</a>.</p>
+
+<p>&nbsp;</p>
+<hr style="border: 1px solid #ddd; padding: 0;" />
+<p>&nbsp;</p>
+
+<h2 style="font-size: 24px">II. Now, what can I do with it?</h2>
+<h2 style="font-size: 18px;">1. Post Annotations to Boundary from Splunk</h2>
+<p style="font-size: 14px;">The Boundary Splunk App allows you to post annotations from Splunk search results on Boundary graphs. To post an annotation to Boundary from a Splunk search, click the drop-down next to the result and choose "Boundary Annotation."</p>
+<p style="font-size: 14px;">The annotation will appear in your streaming Boundary dashboard live.</p>
+<p><img src="/en-US/static/app/boundary/assets/create-annotation.png" width="800" style="border: 1px solid #ccc; box-shadow: 0px 0px 3px #ccc;"></p>
+<p>&nbsp;</p>
+<hr style="border: 1px solid #ddd; padding: 0;" />
+<p>&nbsp;</p>
+<h2 style="font-size: 18px;">2. Trigger Automatic Boundary Annotations based on Splunk Searches</h2>
+<p style="font-size: 14px;">The app also allows you to stream Annotations to Boundary based on logs that appear in Splunk searches automatically in the background. It's a great way to post "error" or other critical information to Boundary.</p>
+<p style="font-size: 14px;">These are configured via "Searches and Reports" in Splunk Manager as scheduled searches that pass output to the Boundary app. We recommend configuring them to run every five minutes over the past five minutes of history. Click the screenshot below to see how they're set up.</p>
+<div style="display: block; overflow: hidden; height: 350px;"><div style="width:382px; height:345px; overflow:hidden; border: 1px solid #ccc; margin:0 auto; box-shadow: 0px 0px 3px #ccc;"><a href="/en-US/static/app/boundary/assets/alert.png" target="_blank"><img src="/en-US/static/app/boundary/assets/alert.png"></a></div></div>
+<p>&nbsp;</p>
+<hr style="border: 1px solid #ddd; padding: 0;" />
+<p>&nbsp;</p>
+
+<h2 style="font-size: 18px;">3. Mix App Topology Data from Boundary into Splunk Searches</h2>
+<p style="font-size: 14px;">This integration allows you to fetch the IP or operating system running on a host, along with a list of all applications on these hosts, as attributes on a search. With this powerful extension to Splunk's query language, you can compose searches that search for logs pertaining to host-to-host or app-to-app traffic when diagnosing problems in your systems.</p>
+<ol><li style="font-size: 14px;"><strong>Get the application names:</strong><br />
+   This is the easiest use case.  In order to get the application names for a particular host, simply run a search and append: <pre>&lt;search&gt; | lookup host_to_app_map host</pre><br/>
+
+The app names associated with that host will appear in a field called app_names.  This field contains comma separated values of application names which are associated with that host.  In order to make this into a Splunk multi-value field:<br/><br/>
+
+<pre>&lt;search&gt; | lookup host_to_app_map host | eval app_names_mv=split(app_names, ",")</pre><br />
+
+This will place the app names into a new field called app_names_mv.<br /><br /></li>
+
+<li style="font-size: 14px;"><strong>Get the IP or operating system associated with a host:</strong><br>
+
+IP addresses are in a different lookup table called meter_info.  This is also a very simple lookup:<br />
+
+<pre>&lt;search&gt; | lookup meter_info host</pre>
+
+This will return info into two new fields for your use, export_ip and os.</li>
+
+<p>&nbsp;</p>
+<hr style="border: 1px solid #ddd; padding: 0;" />
+<p>&nbsp;</p>
+
+<h2 style="font-size: 18px;">4. Load the Boundary AppVis view inside Splunk</h2>
+<p style="font-size: 14px;">The app also adds the Boundary AppVis view as a tab in Splunk. Just click the "Boundary AppVis" tab above to pull it up.</p>
+<p><img src="/en-US/static/app/boundary/assets/appvis.png" width="800" style="border: 1px solid #ccc; box-shadow: 0px 0px 3px #ccc;"></p>
+
+<p>&nbsp;</p>
+<hr style="border: 1px solid #ddd; padding: 0;" />
+<p>&nbsp;</p>
+
+<p style="font-size: 14px;">For support, please contact <a href="mailto:support@boundary.com">support@boundary.com</a>. Happy Splunking!</p>
+
+</div>

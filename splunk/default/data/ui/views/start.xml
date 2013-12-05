@@ -1,0 +1,14 @@
+<view template="dashboard.html">
+  <label>Welcome</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+ 
+  <module name="ServerSideInclude" layoutPanel="panel_row1_col1">
+    <param name="src">start.html</param>
+  </module>
+</view>

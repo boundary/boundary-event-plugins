@@ -1,0 +1,24 @@
+[app/ui]
+version = 4.3.3
+modtime = 1361568381.960657000
+
+[app/launcher]
+version = 4.3.3
+modtime = 1361568381.962395000
+
+[inputs/script%3A%2F%2F%24SPLUNK_HOME%2Fetc%2Fapps%2Fboundary%2Fbin%2Ffetch.py]
+owner = admin
+version = 4.3.3
+modtime = 1361570272.607873000
+
+[boundary/boundary_api]
+version = 4.3.3
+modtime = 1363904227.290324000
+
+[app/install/is_configured]
+version = 4.3.3
+modtime = 1363908453.022769000
+
+[boundary/boundary]
+version = 4.3.3
+modtime = 1363908447.916818000
