@@ -1,0 +1,25 @@
+[]
+access = read : [ * ], write : [ admin, power ]
+export = none
+
+[tags]
+export = system
+
+[props]
+export = system
+
+[transforms]
+export = system
+
+[lookups]
+export = system
+
+[viewstates]
+access = read : [ * ], write : [ * ]
+export = system
+
+[workflow_actions/boundary]
+export = system
+
+[commands/boundary]
+export = system
