@@ -41,9 +41,6 @@ vmware:
 **pollFrequency**
 * Frequency at which the VMware event adapater should poll VMware vSphere for new events
 
-Installation
-------------
-
- 1. Download the jar file
- 2. Change the api-key and org-id fields in the configuration file 
- 3. Start the jar file: java -jar vmware-events-1.0.jar configfile.yml
+Usage
+-----
+Start the jar file: java -jar vmware-events-1.0.jar configfile.yml
