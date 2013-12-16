@@ -1,0 +1,13 @@
+boundary:
+  apiKey: AAABBBCCC
+  orgId: AAABBBCCC
+  httpClient:
+    timeout: 10s
+    connectionTimeout: 10s
+vmware:
+  url: https://vsphere/sdk
+  username: root
+  password: vmware
+  verifyCertificate: false
+  stateFile: .state
+  pollFrequency: 1m
