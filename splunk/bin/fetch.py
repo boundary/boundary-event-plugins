@@ -91,7 +91,7 @@ class Boundary():
             if (app_nodes):
                 for node in app_nodes:
                     if (node in meter_info):
-                        named_app_nodes.extend([meter_info[node]])
+                        named_app_nodes.append(meter_info[node])
                     else:
                         logger.debug("Couldn't find node %s in meter list", node)
         
@@ -125,7 +125,7 @@ class Boundary():
             if (app_nodes):
                 for node in app_nodes:
                     if (node in meter_info):
-                        named_app_nodes.extend([meter_info[node]])
+                        named_app_nodes.append(meter_info[node])
                     else:
                         logger.debug("Couldn't find node %s in meter list", node)
         
