@@ -69,6 +69,13 @@ class Boundary():
     
     def get_convo_graph(self):
         return self.get("/%s/query_state/conversation_graph" % self.org_id)
+    
+    def get_saved_search(self, saved_search):
+        try:
+            return self.get("/%s/searches/%s/results?rows=100" % (self.org_id, saved_search))
+        except urllib2.HTTPError, e:
+            logging.warn("Unable to find saved search %s" % saved_search)
+            return None
 
     # Builds a map of hosts => apps on them.
     def build_host_to_app_map(self, apps, meter_info):
@@ -80,14 +87,18 @@ class Boundary():
             named_app_nodes = []
 
             if (app_nodes):
-                named_app_nodes = [meter_info[node] for node in app_nodes]
-            
+                for node in app_nodes:
+                    if (node in meter_info):
+                        named_app_nodes = [meter_info[node]]
+                    else:
+                        logging.debug("Couldn't find node %s in meter list" % (node))
+        
             if (saved_search):
-                entities = self.get("/%s/searches/%s/results?rows=100" % (self.org_id, saved_search))
-                if (entities.get("entities")):
+                entities = self.get_saved_search(saved_search)
+                if (entities is not None and entities.get("entities")):
                     for entity in entities.get("entities"):
                         named_app_nodes.append(meter_info[int(entity.get("body").get("obs_domain_id"))])
-                logging.debug("Entities for %s: %s", (saved_search, repr(entities)))
+                logging.debug("Entities for %s: %s" % (saved_search, repr(entities)))
 
             for host in named_app_nodes:
                 host_no_domain = host.split('.')[0] + '*'
@@ -110,14 +121,18 @@ class Boundary():
             named_app_nodes = []
 
             if (app_nodes):
-                named_app_nodes = [meter_info[node] for node in app_nodes]
-            
+                for node in app_nodes:
+                    if (node in meter_info):
+                        named_app_nodes = [meter_info[node]]
+                    else:
+                        logging.debug("Couldn't find node %s in meter list" % (node))
+        
             if (saved_search):
-                entities = self.get("/%s/searches/%s/results?rows=100" % (self.org_id, saved_search))
-                if (entities.get("entities")):
+                entities = self.get_saved_search(saved_search)
+                if (entities is not None and entities.get("entities")):
                     for entity in entities.get("entities"):
                         named_app_nodes.append(meter_info[int(entity.get("body").get("obs_domain_id"))])
-                logging.debug("Entities for %s: %s", (saved_search, repr(entities)))
+                logging.debug("Entities for %s: %s" % (saved_search, repr(entities)))
                 
             app_map[app['name']] = {'nodes': named_app_nodes, 'id': app['flowProfile']['id']}
 
