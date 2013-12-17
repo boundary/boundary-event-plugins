@@ -66,7 +66,7 @@ def send_event(event, organization, api_key):
         response = urllib2.urlopen(request)
         response_data = response.read()
         if 'Location' not in response.headers:
-            LOG.error("Failed to create event in Boundary API: %s (%d)",
+            LOG.error("Failed to create event in Boundary API: %s (%d), Error: %s",
                       response.msg, response.code, response_data)
             raise RuntimeError("Unknown response from Boundary API")
         event_id = response.headers['Location'].rsplit('/', 1)[-1]
