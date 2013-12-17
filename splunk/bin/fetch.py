@@ -28,6 +28,8 @@ import urllib2
 import logging
 import ConfigParser
 
+logger = logging.getLogger(__name__)
+
 class Boundary():
     def __init__(self, config_file):
         config = ConfigParser.ConfigParser()
@@ -54,7 +56,7 @@ class Boundary():
         
     # Fetch data from an API endpoint with auth and return the parsed JSON.
     def get(self, url):
-        logging.info("Fetching %s" % url)
+        logger.info("Fetching %s" % url)
         req = urllib2.Request(self.api_base + url)
         req.add_header("Authorization", self.auth)
         return json.loads(urllib2.urlopen(req).read())
@@ -74,7 +76,7 @@ class Boundary():
         try:
             return self.get("/%s/searches/%s/results?rows=100" % (self.org_id, saved_search))
         except urllib2.HTTPError, e:
-            logging.warn("Unable to find saved search %s" % saved_search)
+            logger.warn("Unable to find saved search %s" % saved_search)
             return None
 
     # Builds a map of hosts => apps on them.
@@ -89,16 +91,16 @@ class Boundary():
             if (app_nodes):
                 for node in app_nodes:
                     if (node in meter_info):
-                        named_app_nodes = [meter_info[node]]
+                        named_app_nodes.extend([meter_info[node]])
                     else:
-                        logging.debug("Couldn't find node %s in meter list" % (node))
+                        logger.debug("Couldn't find node %s in meter list", node)
         
             if (saved_search):
                 entities = self.get_saved_search(saved_search)
                 if (entities is not None and entities.get("entities")):
                     for entity in entities.get("entities"):
                         named_app_nodes.append(meter_info[int(entity.get("body").get("obs_domain_id"))])
-                logging.debug("Entities for %s: %s" % (saved_search, repr(entities)))
+                logger.debug("Entities for %s: %s", saved_search, repr(entities))
 
             for host in named_app_nodes:
                 host_no_domain = host.split('.')[0] + '*'
@@ -123,16 +125,16 @@ class Boundary():
             if (app_nodes):
                 for node in app_nodes:
                     if (node in meter_info):
-                        named_app_nodes = [meter_info[node]]
+                        named_app_nodes.extend([meter_info[node]])
                     else:
-                        logging.debug("Couldn't find node %s in meter list" % (node))
+                        logger.debug("Couldn't find node %s in meter list", node)
         
             if (saved_search):
                 entities = self.get_saved_search(saved_search)
                 if (entities is not None and entities.get("entities")):
                     for entity in entities.get("entities"):
                         named_app_nodes.append(meter_info[int(entity.get("body").get("obs_domain_id"))])
-                logging.debug("Entities for %s: %s" % (saved_search, repr(entities)))
+                logger.debug("Entities for %s: %s", saved_search, repr(entities))
                 
             app_map[app['name']] = {'nodes': named_app_nodes, 'id': app['flowProfile']['id']}
 
@@ -140,7 +142,7 @@ class Boundary():
 
     # Write meter info to a CSV file
     def write_meter_info(self, meter_info):
-        logging.info("Writing meter info to %s" % self.meter_info_output)
+        logger.info("Writing meter info to %s" % self.meter_info_output)
         c = csv.writer(open(self.meter_info_output, 'wb'))
         c.writerow(['host', 'obs_dom_id', 'meter_id', 'export_ip', 'os', 'tags'])
 
@@ -152,7 +154,7 @@ class Boundary():
 
     # Write the app map to a CSV file
     def write_app_map(self, app_map):
-        logging.info("Writing app topology to %s" % self.app_map_output)
+        logger.info("Writing app topology to %s" % self.app_map_output)
         c = csv.writer(open(self.app_map_output, 'wb'))
         c.writerow(['app_name', 'conversation_id', 'hosts'])
 
@@ -161,7 +163,7 @@ class Boundary():
 
     # Write the host to app map to a CSV file
     def write_host_to_app_map(self, app_map):
-        logging.info("Writing host to app topology to %s" % self.host_to_app_map_output)
+        logger.info("Writing host to app topology to %s" % self.host_to_app_map_output)
         c = csv.writer(open(self.host_to_app_map_output, 'wb'))
         c.writerow(['host', 'app_names'])
 
@@ -170,7 +172,7 @@ class Boundary():
 
 
     def write_app_to_app(self, apps, convo_graph):
-        logging.info("Writing app-to-app data to %s" % self.app_to_app_output)
+        logger.info("Writing app-to-app data to %s" % self.app_to_app_output)
         c = csv.writer(open(self.app_to_app_output, 'wb'))
         c.writerow(['ts', 'client_app', 'server_app', 'ingress_bytes', 'ingress_packets', \
         'egress_bytes', 'egress_packets', 'rtt', 'handshake_rtt', 'out_of_order', 'retransmits'])
@@ -196,7 +198,7 @@ class Boundary():
         self.write_meter_info(meters)
         self.write_app_to_app(apps, convo_graph)
 
-        logging.info('Done!')
+        logger.info('Done!')
 
 if __name__ == '__main__':
     if 'SPLUNK_HOME' in os.environ:
