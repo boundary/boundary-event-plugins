@@ -189,7 +189,9 @@ class Boundary():
         apps = self.get_applications()
         meters = self.get_meters()
         convo_graph = self.get_convo_graph()
-        meter_info = {int(m['obs_domain_id']): m['name'] for m in meters}
+        meter_info = {}
+        for m in meters:
+            meter_info[int(m['obs_domain_id'])] = m['name']
 
         app_map = self.build_app_map(apps, meter_info)
         host_to_app_map = self.build_host_to_app_map(apps, meter_info)

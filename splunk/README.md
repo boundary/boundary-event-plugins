@@ -79,7 +79,9 @@ This integration allows you to fetch the IP or operating system running on a hos
 2.  **Get the IP or operating system associated with a host:**  
     IP addresses are in a different lookup table called meter_info. This is also a very simple lookup:  
 
-        <search> | lookup meter_info host This will return info into two new fields for your use, export_ip and os.
+        <search> | lookup meter_info host 
+
+    This will return info into two new fields for your use, export_ip and os.
 
 * * *
 
