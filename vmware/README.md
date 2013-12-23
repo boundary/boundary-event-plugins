@@ -3,7 +3,7 @@ VMware Event Adapter
 
 The Boudary VMware event adapater is a standalone java application which contionually polls a single VMware vSphere server for events and forwards them to Boundary.
 
-The source is currently not available but the binary file can be downloaded from https://s3.amazonaws.com/boundary-utils/boundary-event-adapters/vmware/vmware-events-1.0.jar
+The source is currently not available but the binary file can be downloaded from https://s3.amazonaws.com/boundary-utils/boundary-event-adapters/vmware/vmware-events-1.2.jar
 
 The VMware event adapater can be downloaded and placed in any path. For example /opt/boundary/vmware along with a configuration file as described.
 
@@ -43,4 +43,4 @@ vmware:
 
 Usage
 -----
-Start the jar file: java -jar vmware-events-1.0.jar configfile.yml
+Start the jar file: java -jar vmware-events-1.2.jar configfile.yml
