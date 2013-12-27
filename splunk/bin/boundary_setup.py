@@ -46,15 +46,24 @@ class ConfigBoundaryApp(splunk.admin.MConfigHandler):
             self.callerArgs.data['api_key'][0] = ''
         if self.callerArgs.data['org_id'][0] in [None, '']:
             self.callerArgs.data['org_id'][0] = ''
+        
+        splunk_home = os.environ.get('SPLUNK_HOME')
 
         self.writeConf('boundary', 'boundary', self.callerArgs.data)
-        view_file = os.environ['SPLUNK_HOME']+'/etc/apps/boundary/default/data/ui/views/boundary.xml'
-        view_template = os.environ['SPLUNK_HOME']+'/etc/apps/boundary/default/data/ui/views/boundary_default.xml'
-        cmd = "sed 's/ORG_ID/%s/g' %s > %s" % (self.callerArgs.data['org_id'][0], view_template, view_file)
-        logging.info(cmd)
-        os.system(cmd)
+        
+        view_file = open(os.path.join(
+            splunk_home, 'etc', 'apps', 'boundary', 'default', 'data', 'ui', 'views',
+            'boundary.xml'), 'w')
+        view_template = open(os.path.join(
+            splunk_home, 'etc', 'apps', 'boundary', 'default', 'data', 'ui', 'views',
+            'boundary_default.xml'), 'r')
+        
+        for line in view_template:
+            view_file.write(line.replace('ORG_ID', self.callerArgs.data['org_id'][0]))
+        view_template.close()
+        view_file.close()
 
-        install_boundary_py(os.environ.get('SPLUNK_HOME'))
+        install_boundary_py(splunk_home)
 
 
 def install_boundary_py(splunk_home):
