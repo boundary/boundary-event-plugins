@@ -47,16 +47,13 @@ class ConfigBoundaryApp(splunk.admin.MConfigHandler):
         if self.callerArgs.data['org_id'][0] in [None, '']:
             self.callerArgs.data['org_id'][0] = ''
         
-        splunk_home = os.environ.get('SPLUNK_HOME')
+        splunk_home = os.environ['SPLUNK_HOME']
 
         self.writeConf('boundary', 'boundary', self.callerArgs.data)
         
-        view_file = open(os.path.join(
-            splunk_home, 'etc', 'apps', 'boundary', 'default', 'data', 'ui', 'views',
-            'boundary.xml'), 'w')
-        view_template = open(os.path.join(
-            splunk_home, 'etc', 'apps', 'boundary', 'default', 'data', 'ui', 'views',
-            'boundary_default.xml'), 'r')
+        view_dir = os.path.join(splunk_home, 'etc', 'apps', 'boundary', 'default', 'data', 'ui', 'views')
+        view_file = open(os.path.join(view_dir, 'boundary.xml'), 'w')
+        view_template = open(os.path.join(view_dir, 'boundary_default.xml'), 'r')
         
         for line in view_template:
             view_file.write(line.replace('ORG_ID', self.callerArgs.data['org_id'][0]))
