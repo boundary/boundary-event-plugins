@@ -127,7 +127,7 @@ def search_command(apiclient):
                         'eventKey' : "Splunk-search",
                         'sender' : "Splunk",
                  },
-                 'fingerprintFields' : [ "eventKey","sender"],
+                 'fingerprintFields' : [ "@message", "sender"],
                  'createdAt' : createdAt
 	    }
             apiclient.create_event(event)
@@ -165,7 +165,7 @@ def alert_command(apiclient):
                         'source': socket.gethostbyname(socket.gethostname()),
                         'sender': "Splunk",
                  },
-                 'fingerprintFields': [ "eventKey","source","sender"]
+                 'fingerprintFields': [ "@message","sender"]
     }
     return apiclient.create_event(event)
 
