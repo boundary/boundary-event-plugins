@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Boundary Events API Client for Python.
 
 See also: https://app.boundary.com/docs/events_api
@@ -143,7 +142,7 @@ def search_command(apiclient):
 
 def alert_command(apiclient):
     """Invokes Boundary Events as a Saved-Search Alert Command."""
-    message = 'Splunk Alert on ' + socket.gethostbyname(socket.gethostname()) + ' @ os.environ.get(\'SPLUNK_ARG_8\') - ' + os.environ.get('SPLUNK_ARG_6')
+    message = 'Splunk Alert on ' + socket.gethostbyname(socket.gethostname()) + ' @ ' + os.environ.get('SPLUNK_ARG_8') + ' - ' + os.environ.get('SPLUNK_ARG_6')
     if len(message) > 255:
             message = message[:254]
     event = {
