@@ -102,7 +102,7 @@ def search_command(apiclient):
     try:
         results, _, _ = splunk.Intersplunk.getOrganizedResults()
         for result in results:
-            createdAt = time.strftime('%Y-%m-%dT%H:%M:%S', time.gmtime( float(result['_time']) ))
+            createdAt = int(float(result['time']) * 1000)
             title = result['_raw']
             message = result['_raw']
             if len(title) > 254:
@@ -116,14 +116,13 @@ def search_command(apiclient):
                  'severity' : "INFO",
                  'source' : {
                         'ref' : result['host'],
-                        'type' : "instance"
+                        'type' : "host"
                  },
                  'sender' : {
                         'ref' : "Splunk",
                         'type' : "Application"
                  },
                  'properties' : {
-                        'eventKey' : "Splunk-search",
                         'sender' : "Splunk",
                  },
                  'fingerprintFields' : [ "@message", "sender"],
@@ -153,14 +152,13 @@ def alert_command(apiclient):
                  'severity': "ERROR",
                  'source': {
                         'ref': socket.gethostbyname(socket.gethostname()),
-                        'type':"instance"
+                        'type':"host"
                  },
                  'sender': {
                         'ref': "Splunk",
                         'type':"Application"
                  },
                  'properties': {
-                        'eventKey': "Splunk-alert",
                         'source': socket.gethostbyname(socket.gethostname()),
                         'sender': "Splunk",
                  },
