@@ -17,7 +17,9 @@ See also: https://app.boundary.com/docs/events_api
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Greg Albrecht <gba@splunk.com>, C. Scott Andreas <s@boundary.com>, and Clint Sharp'
+__author__ = 'Greg Albrecht <gba@splunk.com>, \
+              C. Scott Andreas <s@boundary.com>, \
+              and Clint Sharp'
 __copyright__ = 'Copyright 2013 Boundary and Splunk, Inc.'
 __license__ = 'Apache License 2.0'
 
@@ -32,7 +34,6 @@ import os
 import traceback
 import urllib2
 import socket
-import time
 
 API_URL = 'https://api.boundary.com'
 
@@ -109,26 +110,26 @@ def search_command(apiclient):
                     title = title[:254]
                     message = message[:200]
             event = {
-                 'title' : title,
-                 'message' : 'Results of a Splunk Search command:' + message,
-                 'tags' : ["Splunk","search"],
-                 'status' : "OK",
-                 'severity' : "INFO",
-                 'source' : {
-                        'ref' : result['host'],
-                        'type' : "host"
-                 },
-                 'sender' : {
-                        'ref' : "Splunk",
-                        'type' : "Application"
-                 },
-                 'properties' : {
-                        'sender' : "Splunk",
-                 },
-                 'fingerprintFields' : [ "@message", "sender"],
-                 'createdAt' : createdAt
-	    }
-            apiclient.create_event(event)
+                'title': title,
+                'message': 'Results of a Splunk Search command:' + message,
+                'tags': ["Splunk", "search"],
+                'status': "OK",
+                'severity': "INFO",
+                'source': {
+                    'ref': result['host'],
+                    'type': "host"
+                },
+                'sender': {
+                    'ref': "Splunk",
+                    'type': "Application"
+                },
+                'properties': {
+                    'sender': "Splunk",
+                },
+                'fingerprintFields': ["@message", "sender"],
+                'createdAt': createdAt
+            }
+        apiclient.create_event(event)
     # TODO(gba) Catch less general exception.
     except Exception:
         stack = traceback.format_exc()
@@ -141,28 +142,31 @@ def search_command(apiclient):
 
 def alert_command(apiclient):
     """Invokes Boundary Events as a Saved-Search Alert Command."""
-    message = 'Splunk Alert on ' + socket.gethostbyname(socket.gethostname()) + ' @ ' + os.environ.get('SPLUNK_ARG_8') + ' - ' + os.environ.get('SPLUNK_ARG_6')
+    message = 'Splunk Alert on ' + \
+              socket.gethostbyname(socket.gethostname()) + \
+              ' @ ' + os.environ.get('SPLUNK_ARG_8') + \
+              ' - ' + os.environ.get('SPLUNK_ARG_6')
     if len(message) > 255:
             message = message[:254]
     event = {
-                'title': os.environ.get('SPLUNK_ARG_4'),
-                 'message' : message,
-                 'tags' : ["Splunk","alert"],
-                 'status': "OPEN",
-                 'severity': "ERROR",
-                 'source': {
-                        'ref': socket.gethostbyname(socket.gethostname()),
-                        'type':"host"
-                 },
-                 'sender': {
-                        'ref': "Splunk",
-                        'type':"Application"
-                 },
-                 'properties': {
-                        'source': socket.gethostbyname(socket.gethostname()),
-                        'sender': "Splunk",
-                 },
-                 'fingerprintFields': [ "@message","sender"]
+        'title': os.environ.get('SPLUNK_ARG_4'),
+        'message': message,
+        'tags': ["Splunk", "alert"],
+        'status': "OPEN",
+        'severity': "ERROR",
+        'source': {
+            'ref': socket.gethostbyname(socket.gethostname()),
+            'type': "host"
+        },
+        'sender': {
+            'ref': "Splunk",
+            'type': "Application"
+        },
+        'properties': {
+            'source': socket.gethostbyname(socket.gethostname()),
+            'sender': "Splunk",
+        },
+        'fingerprintFields': ["@message", "sender"]
     }
     return apiclient.create_event(event)
 
