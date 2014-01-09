@@ -129,7 +129,7 @@ def search_command(apiclient):
                 'fingerprintFields': ["@message", "sender"],
                 'createdAt': createdAt
             }
-        apiclient.create_event(event)
+            apiclient.create_event(event)
     # TODO(gba) Catch less general exception.
     except Exception:
         stack = traceback.format_exc()
