@@ -126,7 +126,7 @@ def search_command(apiclient):
                 'properties': {
                     'sender': "Splunk",
                 },
-                'fingerprintFields': ["@title", "sender"],
+                'fingerprintFields': ["sender"],
                 'createdAt': createdAt
             }
             apiclient.create_event(event)
