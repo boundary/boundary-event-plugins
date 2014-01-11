@@ -86,6 +86,9 @@ def update_event(auth_header, event, ticketid):
     #connect to boundary
     url = '/'.join([API_URL, ORG_ID, 'events'])
 
+    #set time
+    event["createdAt"] = event["lastUpdatedAt"]
+
     #update properties
     tlink = SN_URL + "/incident.do?sysparm_query=number%3D" + ticketid
     props = event["properties"]
