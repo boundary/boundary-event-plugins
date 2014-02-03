@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-#SNOWBOUND - This is a python based "plug-in" that can be used to generate tickets in ServiceNow from Boundary events.
+#SNOWBOUND - This is a python based adapter that can be used to generate tickets in ServiceNow from Boundary events.
 #Author: Patrick Barker
-#Last update: Sep 24, 2013
-#Reason: Update the script to select a single event from Boundary and create a ticket in ServiceNow for it. 
+#Last update: Feb 3, 2014
+#Reason: Defensive code for processing events without data in optional event fields.
 
 
 import sys
@@ -99,8 +99,9 @@ def update_event(auth_header, event, ticketid):
     #update tags
     tags = []
 
-    if len(event["tags"]) > 0:
-        tags = event["tags"]
+    if "tags" in event:
+        if len(event["tags"]) > 0:
+            tags = event["tags"]
 
     tags.append ("ticketed")
     tags.append (str(ticketid))
@@ -120,6 +121,16 @@ def build_ticket(event):
     equery='events?search=id%3A' + str(event["id"])
     elink='/'.join([BN_URL, ORG_ID, equery])
 
+    if "message" not in event:
+       message=event["title"]
+    else:
+       message=event["message"]
+
+    if "sender" not in event:
+        sender=""
+    else:
+        sender=str(event["sender"]["ref"])
+
     ticket = {
         'sysparm_action':"insert",
         'short_description':event["title"],
@@ -128,10 +139,10 @@ def build_ticket(event):
         'work_notes': '\n' \
         + '[code]<a href="' + elink + '"> Boundary Event Link </a>[/code]' \
         + '\n' + 'event id: ' + str(event["id"]) \
-        + '\n' + 'event message: ' + event["message"] \
+        + '\n' + 'event message: ' + message \
         + '\n' + 'event severity: ' + event["severity"] \
         + '\n' + 'event status: ' + event["status"] \
-        + '\n' + 'event sender: ' + str(event["sender"]["ref"]) \
+        + '\n' + 'event sender: ' + sender \
         + '\n' + 'event first seen at: ' + event["firstSeenAt"] \
         + '\n' + 'event last seen at: ' + event["lastSeenAt"] 
     }
