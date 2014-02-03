@@ -1,188 +1,220 @@
 #!/usr/bin/env python
 
-#SNOWBOUND - This is a python based adapter that can be used to generate tickets in ServiceNow from Boundary events.
 #Author: Patrick Barker
-#Last update: Feb 3, 2014
-#Reason: Defensive code for processing events without a message field.
+#Summary: This is a simple python script used to generate Boundary events from AWS CloudTrail records.
+#Last update: Aug 22, 2013
+#Reason: 
 
 
 import sys
-from random import choice
-from pprint import pprint
-import random
 import time
+import pprint
+import gzip
+import boto
+from boto.sqs.message import RawMessage
+import json
+import urllib2
+import base64
+import os
 import ConfigParser
-try:
-    import json
-except ImportError:
-    import simplejson as json
-try:
-    import urllib2
-    import base64
-    import os
-    from optparse import OptionParser
-    import ConfigParser
-    import datetime
-except ImportError, err:
-    sys.stderr.write("ERROR: Couldn't load module. %s\n" % err)
-    sys.exit(-1)
-
-__all__ = [ 'main', ]
 
 config = ConfigParser.RawConfigParser()
-config.read('snowbound.cfg')
+config.read(os.path.join(os.path.dirname(__file__), 'boundary-cloudtrail.cfg'))
 
-# global variables
-BN_URL=config.get('boundary', 'main-url')
-API_URL=config.get('boundary', 'api-url')
-API_KEY=config.get('boundary', 'api-key')
-ORG_ID=config.get('boundary', 'org-id')
-E_QUERY=config.get('boundary', 'event-query')
+#Boundary Variables
+API_URL = config.get('boundary', 'api-url')
+ORG_ID = config.get('boundary', 'org-id')
+API_KEY = config.get('boundary', 'api-key')
 
-SN_URL=config.get('servicenow', 'url')
-SN_CRD=':'.join([config.get('servicenow', 'user'), config.get('servicenow', 'pass')])
+#AWS Variables
+AWS_TMP_PATH = config.get('cloudtrail', 'tmp-path')
+AWS_ID = config.get('cloudtrail', 'access-key-id')
+AWS_KEY = config.get('cloudtrail', 'secret-access-key')
+AWS_ZONE = config.get('cloudtrail', 'availability-zone')
+SQS_QUEUE = config.get('cloudtrail', 'sqs-queue-name')
 
-DT_FORMAT = '%Y-%m-%dT%H:%M:00.000+02:00'
+
+def process_queue():
+    conn = boto.sqs.connect_to_region(AWS_ZONE, aws_access_key_id=AWS_ID, aws_secret_access_key=AWS_KEY)
+    #conn = boto.connect_sqs(AWS_ID, AWS_KEY)
+    queue = conn.get_queue(SQS_QUEUE)
+    queue.set_message_class(RawMessage)
+    mcount = queue.count()
+    print "message count >>" + str(mcount) + "<<"
+
+    #for i in range(1):
+    for i in range(mcount):
+        rs = queue.get_messages()
+        message = rs[0]
+        json_body = json.loads(message.get_body())
+        pprint.pprint(json_body)
+
+        if 's3Bucket' in json_body.keys():
+            bname = json.dumps(json_body["s3Bucket"])
+            bname = bname.strip('"')
+
+            okpath = json.dumps(json_body["s3ObjectKey"][0])
+            okpath = okpath.strip('"')
+
+            filename = dl_file(bname, okpath)
+            build_event(filename)
+
+            queue.delete_message(message)
 
 
-def encode_bn_auth():
-    b64_auth = base64.encodestring( ':'.join([API_KEY, ''])).replace('\n', '')
+def dl_file(bname, okpath):
+    print bname + ' ' + okpath
+
+    conn = boto.connect_s3(AWS_ID, AWS_KEY)
+    bucket = conn.get_bucket(bname)
+
+    lst = okpath.split('/')
+    lst.reverse()
+    okname = lst[0]
+
+    key = bucket.get_key(okpath)
+    filename = '/'.join([AWS_TMP_PATH, okname])
+    key.get_contents_to_filename(filename)
+
+    return filename
+
+
+def encode_apikey(apikey):
+    b64_auth = base64.encodestring(':'.join([apikey, ''])).replace('\n', '')
     return ' '.join(['Basic', b64_auth])
 
-def encode_sn_auth():
-    b64_auth = base64.encodestring( SN_CRD ).replace('\n', '')
-    return ' '.join(['Basic', b64_auth])
 
-def get_tickets(auth_header):
-    url = '/'.join([SN_URL, 'incident.do?JSON&sysparm_action=getRecords&sysparm_query=active=true'])
+def create_event(event):
+    auth_header = encode_apikey(API_KEY)
+    # Create event in boundary.
 
-    req = urllib2.Request(url)
-
-    req.add_header('Authorization',auth_header)
-
-    response = urllib2.urlopen(req)
-
-    tickets = json.load(response)
-
-    for ticket in tickets ["records"]:
-        pprint(ticket)
-
-def get_events(auth_header):
-    url = '/'.join([API_URL, ORG_ID, E_QUERY])
-
-    print "query url >>>" + url + "<<<"
-
-    req = urllib2.Request(url)
-
-    req.add_header('Authorization',auth_header)
-
-    response = urllib2.urlopen(req)
-
-    events = json.load(response)
-
-    return events
-
-def update_event(auth_header, event, ticketid):
-    #connect to boundary
     url = '/'.join([API_URL, ORG_ID, 'events'])
 
-    #set time
-    event["createdAt"] = event["lastUpdatedAt"]
-
-    #update properties
-    tlink = SN_URL + "/incident.do?sysparm_query=number%3D" + ticketid
-    props = event["properties"]
-    plink = {'ticket link' : [{"href":tlink}]}
-    props.update (plink)
-    event["properties"] = props
-
-    #update tags
-    tags = []
-
-    if "tags" in event:
-        if len(event["tags"]) > 0:
-            tags = event["tags"]
-
-    tags.append ("ticketed")
-    tags.append (str(ticketid))
-    event["tags"] = tags
-
-    #encode event record
     event_json = json.dumps(event)
+    print "event >>" + event_json + "<<"
 
-    #transmit update request
     req = urllib2.Request(url, event_json, {'Content-type': 'application/json'})
     req.add_header('Authorization', auth_header)
-    response = urllib2.urlopen(req)
 
-    print response.read()
+    return urllib2.urlopen(req)
 
-def build_ticket(event):
-    equery='events?search=id%3A' + str(event["id"])
-    elink='/'.join([BN_URL, ORG_ID, equery])
 
-    if "message" not in event:
-       message=event["title"]
-    else:
-       message=event["message"]
+def build_event(filename):
+    json_data = gzip.open(filename, 'rb')
+    data = json.load(json_data)
+    json_data.close()
+    os.remove(filename)
+    slink = "https://console.aws.amazon.com/ec2/home?region=" + AWS_ZONE + "#s=SecurityGroups"
+    awslink = "https://console.aws.amazon.com/console"
 
-    if "sender" not in event:
-        sender=""
-    else:
-        sender=str(event["sender"]["ref"])
+    count = 0
 
-    ticket = {
-        'sysparm_action':"insert",
-        'short_description':event["title"],
-        'priority':"1",
-        'opened_by':"Boundary",
-        'work_notes': '\n' \
-        + '[code]<a href="' + elink + '"> Boundary Event Link </a>[/code]' \
-        + '\n' + 'event id: ' + str(event["id"]) \
-        + '\n' + 'event message: ' + message \
-        + '\n' + 'event severity: ' + event["severity"] \
-        + '\n' + 'event status: ' + event["status"] \
-        + '\n' + 'event sender: ' + sender \
-        + '\n' + 'event first seen at: ' + event["firstSeenAt"] \
-        + '\n' + 'event last seen at: ' + event["lastSeenAt"] 
-    }
+    for item in data["Records"]:
+        userid = item["userIdentity"]
+        #rparams = str(item["requestParameters"])
+        rp_json = json.dumps(item["requestParameters"])
+        rparams = str(pprint.pformat(rp_json))
+        #pprint(userid)
 
-    return ticket
+        title = "AWS CloudTrail - " + item["eventName"]
+        action = item["eventName"]
 
-def generate_tickets(bn_auth_header, sn_auth_header):
-    #Use get_events to grab an event and use its fields to create the ticket
-    events = get_events(bn_auth_header)
+        severity = "INFO"
+        if "Describe" not in action:
+            severity = "WARN"
+        if "Revoke" in action:
+            severity = "CRITICAL"
+        if "Authorize" in action:
+            severity = "ERROR"
 
-    for event in events["results"]:
-        ticket = build_ticket(event) 
+        region = item["awsRegion"]
+        source = item["sourceIPAddress"]
+        sender = "AWS CloudTrail"
+        status = "OK"
+        principal = userid["principalId"]
+        utype = userid["type"]
+        arn = userid["arn"]
+        account = userid["accountId"]
+        eventtime = item["eventTime"]
 
-        ticketid = post_ticket(ticket,sn_auth_header)
+        agent = "NotIAMAccount"
+        if "userAgent" in item:
+            agent = item["userAgent"]
 
-        print "ticket number >>>" + ticketid + "<<<" + " event id >>>" + str(event["id"]) + "<<<"
+            if len(agent) > 20: 
+                lst = agent.split('/')
+                agent = lst[0]
+ 
+        username = "sampleIAMuser"
+        if "userName" in userid:
+            username = userid["userName"]
 
-        update_event(bn_auth_header, event, ticketid)
+        groupname = ""
+        if "ipPermissions" in rparams:
+            #groupname = json.dumps(rparams["ipPermissions"][0]["groupName"])
+            groupname = json.dumps(rparams[0])
 
-def post_ticket(ticket,auth_header):
-    url = '/'.join([SN_URL,'incident.do?JSON'])
+        print "groupname >>" + groupname + "<<"
+        message = item["eventName"] + " was executed on " \
+            + item["eventSource"] + " from " \
+            + source + " through " \
+            + agent + " in " \
+            + region + " by " \
+            + username
+     
+        if "Security" in action:
+            event = {
+                'source': {"type": "host", "ref": source},
+                'sender': {"type": sender, "ref": sender},
+                'properties': {
+                    "sender": sender, "source": source, "action": action,
+                    "agent": agent, "accountid": account, "username": username,
+                    "eventtime": str(eventtime), "AWS Link": [{"href": slink}]
+                },
+                'title': title,
+                'createdAt': eventtime,
+                'message': message,
+                'severity': severity,
+                'status': status,
+                'tags': [source, sender, severity, action, region, agent, account, username],
+                'fingerprintFields': ['source', 'sender', 'action', 'username', 'eventtime']
+            }
+        else:
+            event = {
+                'source': {"type": "host", "ref": source},
+                'sender': {"type": sender, "ref": sender},
+                'properties': {
+                    "sender": sender, "source": source, "action": action,
+                    "agent": agent, "accountid": account, "username": username,
+                    "AWS Link": [{"href": awslink}]
+                },
+                'title': title,
+                'createdAt': eventtime,
+                'message': message,
+                'severity': severity,
+                'status': status,
+                'tags': [source, sender, severity, action, region, agent, account, username],
+                'fingerprintFields': ['source', 'sender', 'action', 'username']
+            }
 
-    ticket_json = json.dumps(ticket)
+        #pprint(event)
+        create_event(event)
 
-    req = urllib2.Request( url, ticket_json, {'Content-type': 'application/json'})
+        #for throttling purposes
+        count += 1
 
-    req.add_header('Authorization', auth_header)
-    response = urllib2.urlopen(req)
-    ticket = json.load (response)
+        if count / 2 == 1:
+            time.sleep(1) 
+            count = 0
 
-    return ticket["records"][0]["number"]
+    print "Processed AWS CloudTrail payload >>" + filename + "<<"
+
 
 def main():
-    bn_auth_header = encode_bn_auth()
-    #get_events(bn_auth_header)
-
-    sn_auth_header = encode_sn_auth()
-    #get_tickets(sn_auth_header)
-
-    generate_tickets(bn_auth_header, sn_auth_header)
+    if len(sys.argv) > 1:
+        build_event(str(sys.argv[1]))
+    else:
+        process_queue()
 
 if __name__ == "__main__":
     main()
