@@ -73,7 +73,7 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				break
 
 		if ('severity' in nr_event and nr_event['severity'] in SEVERITY_MAP):
-			b_event['severity'] = SEVERITY_MAPPING[nr_event['severity']]
+			b_event['severity'] = SEVERITY_MAP[nr_event['severity']]
 
 		""" Put everything else in properties """
 		b_event['properties'] = nr_event
