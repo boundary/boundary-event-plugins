@@ -13,8 +13,5 @@ Configuration:
 - Install AWS SDK for Ruby
       - Documentation found at https://aws.amazon.com/sdkforruby/
 
-Note:
-- This is a demonstration script intended to showcase Boundary's Events API, and how it may work with other products. Your mileage may vary.
-
-For problems email support@boundary.com
+For help, email support@boundary.com
      
