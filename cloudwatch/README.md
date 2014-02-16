@@ -5,7 +5,7 @@ Very simple
 - If alerts are OK or ALERT type, posts them out to Boundary Events Console
 
 Configuration:
-- Be sure to have the cacert.pem file, this is required for encryption.
+- Be sure to have the cacert.pem file located here: [cacert.pem] (https://github.com/boundary/boundary-event-plugins/tree/master/common), this is required for encryption.
 - Edit Boundary variables BOUNDARY_ORGID and BOUNDARY_APIKEY
       - These can be found in Boundary under Configure > Organization
 - Edit Amazon EC2 variables ACCESS_KEY_ID and SECRET_KEY
