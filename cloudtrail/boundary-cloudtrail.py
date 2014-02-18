@@ -30,12 +30,12 @@ API_KEY = config.get('boundary', 'api-key')
 AWS_TMP_PATH = config.get('cloudtrail', 'tmp-path')
 AWS_ID = config.get('cloudtrail', 'access-key-id')
 AWS_KEY = config.get('cloudtrail', 'secret-access-key')
-AWS_ZONE = config.get('cloudtrail', 'availability-zone')
+AWS_REGION = config.get('cloudtrail', 'region')
 SQS_QUEUE = config.get('cloudtrail', 'sqs-queue-name')
 
 
 def process_queue():
-    conn = boto.sqs.connect_to_region(AWS_ZONE, aws_access_key_id=AWS_ID, aws_secret_access_key=AWS_KEY)
+    conn = boto.sqs.connect_to_region(AWS_REGION, aws_access_key_id=AWS_ID, aws_secret_access_key=AWS_KEY)
     #conn = boto.connect_sqs(AWS_ID, AWS_KEY)
     queue = conn.get_queue(SQS_QUEUE)
     queue.set_message_class(RawMessage)
@@ -104,7 +104,7 @@ def build_event(filename):
     data = json.load(json_data)
     json_data.close()
     os.remove(filename)
-    slink = "https://console.aws.amazon.com/ec2/home?region=" + AWS_ZONE + "#s=SecurityGroups"
+    slink = "https://console.aws.amazon.com/ec2/home?region=" + AWS_REGION + "#s=SecurityGroups"
     awslink = "https://console.aws.amazon.com/console"
 
     count = 0
