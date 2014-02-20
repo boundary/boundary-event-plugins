@@ -12,7 +12,7 @@ Configuration
 -------------
 
 To enable the webhook in New Relic
-* Visit https://rpm.newrelic.com/accounts/103901/alert_policies#tab-alert_policies=notification_channels_tab
+* Visit `https://rpm.newrelic.com/accounts/{your_newrelic_acct}/alert_policies#tab-alert_policies=notification_channels_tab`
 * Click Create Channel -> Webhook 
 * Enter the address address the webhook will be accessible from  
 * Click Integrate with Webhooks
