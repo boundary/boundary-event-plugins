@@ -60,6 +60,9 @@ def process_queue():
             build_event(filename)
 
             queue.delete_message(message)
+        else:
+            print "s3Bucket not found in message, skipping message..."
+            time.sleep(1)
 
 
 def dl_file(bname, okpath):
