@@ -16,20 +16,25 @@ steps in the Zenoss UI:
 
 * Navigate to Events -> Event Manager -> Commands.
 * Specify a command name and click 'Add'.
+
+![add event command](https://github.com/boundary/boundary-event-plugins/raw/master/zenoss/img/add_event_command.png)
+
 * Click on the link for the created command to edit its settings.
 * Assuming the script has been installed to the `/opt/boundary/bin` directory, specify the following in the 'Command' field:
 
-```
+```shell
 /opt/boundary/bin/boundary-zenoss3.py --fingerprint-field evid --property 'evid=${evt/evid}' --source-ref '${evt/device}' --created-at '${evt/lastTime}' --property  'component=${evt/component}' --property 'eventClass=${evt/eventClass}' --property 'eventKey=${evt/eventKey}' --title '${evt/summary}' --message '${evt/message}' --zenoss-severity ${evt/severity} --zenoss-state ${evt/eventState} --property 'eventClassKey=${evt/eventClassKey}' --property 'eventGroup=${evt/eventGroup}' --property 'stateChange=${evt/stateChange}' --property 'firstTime=${evt/firstTime}' --property 'lastTime=${evt/lastTime}' --property 'prodState=${evt/prodState}' --property 'suppid=${evt/suppid}' --property 'manager=${evt/manager}' --property 'agent=${evt/agent}' --property 'DeviceClass=${evt/DeviceClass}' --property 'Location=${evt/Location}' --property 'Systems=${evt/Systems}' --property 'DeviceGroups=${evt/DeviceGroups}' --property 'ipAddress=${evt/ipAddress}' --property 'facility=${evt/facility}' --property 'priority=${evt/priority}' --property 'nvevid=${evt/ntevid}' --property 'ownerid=${evt/ownerid}' --property 'clearid=${evt/clearid}' --property 'DevicePriority=${evt/DevicePriority}' --property 'eventClassMapping=${evt/eventClassMapping}' --property 'monitor=${evt/monitor}'
 ```
 
 * Specify this in the 'Clear Command' field:
 
-```
+```shell
 /opt/boundary/bin/boundary-zenoss3.py --fingerprint-field evid --property 'evid=${evt/evid}' --source-ref '${evt/device}' --created-at '${evt/lastTime}' --property  'component=${evt/component}' --property 'eventClass=${evt/eventClass}' --property 'eventKey=${evt/eventKey}' --title '${evt/summary}' --message '${evt/message}' --zenoss-severity ${evt/severity} --status CLOSED --property 'eventClassKey=${evt/eventClassKey}' --property 'eventGroup=${evt/eventGroup}' --property 'stateChange=${evt/stateChange}' --property 'firstTime=${evt/firstTime}' --property 'lastTime=${evt/lastTime}' --property 'prodState=${evt/prodState}' --property 'suppid=${evt/suppid}' --property 'manager=${evt/manager}' --property 'agent=${evt/agent}' --property 'DeviceClass=${evt/DeviceClass}' --property 'Location=${evt/Location}' --property 'Systems=${evt/Systems}' --property 'DeviceGroups=${evt/DeviceGroups}' --property 'ipAddress=${evt/ipAddress}' --property 'facility=${evt/facility}' --property 'priority=${evt/priority}' --property 'nvevid=${evt/ntevid}' --property 'ownerid=${evt/ownerid}' --property 'clearid=${evt/clearid}' --property 'DevicePriority=${evt/DevicePriority}' --property 'eventClassMapping=${evt/eventClassMapping}' --property 'monitor=${evt/monitor}'
 ```
 
 * Add a filter to match the events to be forwarded to Boundary, and enable the Event Command.
+
+![define event command](https://github.com/boundary/boundary-event-plugins/raw/master/zenoss/img/define_event_command.png)
 
 Usage
 -------------
@@ -64,7 +69,7 @@ Options:
     --source-property="KEY=VALUE"
                         Source Property
     --sender-ref=SENDER_REF
-                        Sender Reference (default: tweekbook.local)
+                        Sender Reference (default: localhost)
     --sender-type=SENDER_TYPE
                         Sender Type
     --sender-property="KEY=VALUE"
