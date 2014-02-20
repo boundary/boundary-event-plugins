@@ -44,13 +44,13 @@ def load_config():
 class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_POST(self):
 		""" Response to POST request """
-		self.post_data = self.rfile.read(int(self.headers['Content-Length']))
+		self.post_data = urllib2.unquote(self.rfile.read(int(self.headers['Content-Length']))).decode('utf8')
 		self.send_response(202)
 		self.end_headers()
 
 		""" Process JSON from request """
 		""" Hack because NR sends invalid JSON """
-		s = self.post_data.split(': ',1)
+		s = self.post_data.split('=',1)
 		nr_event_type = s[0]
 		nr_event_json = s[1]
 		nr_event = json.loads(nr_event_json)
@@ -58,14 +58,17 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		""" Map new relic object to Boundary event """
 		b_event = { 
 			'title': nr_event_type,
-			'fingerprintFields': ['alert_url',],
 			'source': { 'ref': nr_event['application_name'], 'type': 'application'},
 			'sender': { 'ref': 'New Relic', 'type': 'Adapter'},
 			'createdAt': nr_event['created_at'],
 		}
 
 		if nr_event_type == 'alert':
+			b_event['fingerprintFields'] = ['alert_url',]
 			b_event['status'] = 'OPEN'
+		elif nr_event_type == 'deployment':
+			b_event['fingerprintFields'] = ['deployment_url',]
+			b_event['status'] = 'OK'
 
 		for field in ['long_description','message','short_description','description']:
 			if (field in nr_event):
