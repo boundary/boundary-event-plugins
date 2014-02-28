@@ -43,3 +43,7 @@ Add the following to your `nagios.cfg` (the first three lines may already exist)
     global_service_event_handler=handle_boundary_event_service
 
 Restart Nagios!
+
+For OMD implementations
+---
+The boundary_eventhandlers.mk file should be placed in the $OMD_ROOT/etc/check_mk/conf.d directory and will be applied to the managed Nagios instance once OMD is restarted.
