@@ -17,7 +17,66 @@ sqs-queue-name = [AWS CloudTrail SQS Queue Name]
 * Controls where CloudTrail payload files are temporarily stored while they’re being processed by the adapter.
  
 **access-key-id**
-* Supplies the AWS Access Key ID that can be used to access the desired AWS environment.
+* Supplies the AWS Access Key ID that can be used to access the desired AWS environment. This can be the id to a specific user (IAM or otherwise) that has been setup for the adapter or a pre-existing account. In either case, the account will need "read" privelages to SQS, S3 the access policy below can be applied to the user record to establish the necessary permissions.
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1392930026000",
+      "Effect": "Allow",
+      "Action": [
+        "sqs:*"
+      ],
+      "Resource": [
+        "INSERT SQS ARN HERE"
+      ]
+    },
+    {
+      "Sid": "Stmt1392930466000",
+      "Effect": "Allow",
+      "Action": [
+        "sqs:ListQueues"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "Stmt1392930063000",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "INSERT S3 ARN HERE"
+      ]
+    },
+    {
+      "Sid": "Stmt1392930914000",
+      "Effect": "Allow",
+      "Action": [
+        "s3:List*",
+        "s3:Get*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "Stmt1392930305000",
+      "Effect": "Allow",
+      "Action": [
+        "sns:*"
+      ],
+      "Resource": [
+        "INSERT SNS ARN HERE"
+      ]
+    }
+  ]
+}
+```
  
 **secret-access-key**
 * Captures the AWS Secret Access Key or password that is used along with the access key id to authenticate with AWS.
