@@ -9,7 +9,7 @@ This adapter is written for and works best on Linux and UNIX based operating sys
 It requires: 
 
 1. Ruby 1.9.3 or later ([RVM] (http://rvm.io/rvm/install) is recommended for upgrading where necessary)
-2. Ruby gems package manager
+2. Ruby [gems installer] (http://rubygems.org/pages/download)
 3. These gems - json, httparty, rsolr
 
 How to Use
