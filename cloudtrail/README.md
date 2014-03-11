@@ -17,7 +17,7 @@ sqs-queue-name = [AWS CloudTrail SQS Queue Name]
 * Controls where CloudTrail payload files are temporarily stored while they’re being processed by the adapter.
  
 **access-key-id**
-* Supplies the AWS Access Key ID that can be used to access the desired AWS environment. This can be the id to a specific user (IAM or otherwise) that has been setup for the adapter or a pre-existing account. In either case, the account will need "read" privelages to SQS, S3 the access policy below can be applied to the user record to establish the necessary permissions.
+* Supplies the AWS Access Key ID that can be used to access the desired AWS environment. This can be the id to a specific user (IAM or otherwise) that has been setup for the adapter or a pre-existing account. In either case, the account will need "read" privelages to the related SNS, SQS, and S3 objects. The access policy below can be applied to the user record to establish the necessary permissions.
 
 ```
 {
