@@ -6,8 +6,10 @@ This script is for use with Nagios to send host and service status changes to th
 Requirements
 ---
 
-- Ruby
 - Boundary API SSL CA certificate, located here: [cacert.pem] (https://github.com/boundary/boundary-event-plugins/tree/master/common) 
+- Ruby 1.9.3 or later ([RVM] (http://rvm.io/rvm/install) is recommended for upgrading where necessary)
+- Ruby [gems installer] (http://rubygems.org/pages/download)
+- These gems - json, uri, yaml
 
 Setup
 ---
