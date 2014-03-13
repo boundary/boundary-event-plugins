@@ -25,15 +25,16 @@ require 'httparty'
 require 'rsolr' 
 
 BOUNDARY_API_HOST = "api.boundary.com"
-ZABBIX_API_HOST = "ZABBIX HOSTNAME or IP"
+#ZABBIX_API_HOST = "ZABBIX HOSTNAME or IP"
+ZABBIX_API_HOST = "192.168.128.130"
 CACERT_PATH = "#{File.dirname(__FILE__)}/cacert.pem"
 
 # CONFIGURATIONS
 
-BOUNDARY_ORGID = ""
-BOUNDARY_APIKEY = ""
-ZABBIX_USER = ""
-ZABBIX_PASSWORD = ""
+BOUNDARY_ORGID = "3ehRi7uZeeaTN12dErF5XOnRXjC"
+BOUNDARY_APIKEY = "ARI0PzUzWYUo7GG1OxiHmABTpr9"
+ZABBIX_USER = "Admin"
+ZABBIX_PASSWORD = "zabbix"
 POLLING_PERIOD = 60
 
 """
@@ -47,6 +48,7 @@ class BoundaryEvents
   #
 
   def initialize()
+    #print "intialize()\n"
     @boundary_orgid = BOUNDARY_ORGID
     @boundary_apikey = BOUNDARY_APIKEY
     @zabbix_user = ZABBIX_USER
@@ -58,10 +60,12 @@ class BoundaryEvents
     @past_timestamp = @past.utc.iso8601     # beginning of polling period
     @past_epoch = @past.to_i
     @past_fuc = Time.at(@past).utc
+    #print("NOW: " + now.to_s() + ", EPOCH: " + @past_epoch.to_s() + "\n")
   end
 
 # create a hash to login to Zabbix
   def zabbix_user_login_parse 
+    #print "zabbix_user_login_parse()\n"
     user_obj = {
       :jsonrpc => "2.0",
       :method => "user.login",
@@ -76,6 +80,7 @@ class BoundaryEvents
 
 # create a hash to request PROBLEM triggers from Zabbix
   def zabbix_get_triggers_parse(auth_key)
+    #print "zabbix_get_triggers_parse()\n"
     obj = {
       :jsonrpc => "2.0",
       :method => "trigger.get",
@@ -84,6 +89,7 @@ class BoundaryEvents
 		"triggerid",
 		"description",
 		"priority",
+		"lastchange",
                 "value" 
 	],
         :filter => {
@@ -94,7 +100,7 @@ class BoundaryEvents
         :expandData => true,
         :expandComment => true,
         :expandDescription => true,
- #       :lastChangeSince => 0 #  @past
+       :lastChangeSince => @past
       },
       :auth => auth_key,
       :id => 1
@@ -104,6 +110,7 @@ class BoundaryEvents
 
 # get zabbix problem triggers, parse the interesting stuff, return in hash form
   def zabbix_get_triggers(obj)
+    #print "zabbix_get_triggers()\n"
     headers = { "Content-Type" => "application/json"}
     uri = URI( "http://#{ZABBIX_API_HOST}/zabbix/api_jsonrpc.php")
     http = Net::HTTP.new(uri.host, uri.port)
@@ -121,6 +128,7 @@ class BoundaryEvents
 
 # login to zabbix
   def zabbix_login(auth_obj)
+    #print "zabbix_login()\n"
     headers = { "Content-Type" => "application/json"}
     uri = URI( "http://#{ZABBIX_API_HOST}/zabbix/api_jsonrpc.php") 
     http = Net::HTTP.new(uri.host, uri.port)
@@ -145,29 +153,35 @@ class BoundaryEvents
         end
       end
     rescue Timeout::Error
-      print "Timed out while attempting to authenticate with Zabbix"
+      print "Timed out while attempting to authenticate with Zabbix\n"
     end
   end
 
 # parse zabbix trigger messages
   def zabbix_trigger_parse(trigger_obj)
+    #print "zabbix_trigger_parse()\n"
     events = Array.new
+    #print("trigger_obj: " + trigger_obj + "\n")
     trigger_json = JSON.parse(trigger_obj)
     trigger_json["result"].each { |subresult|
+       
        description = subresult["description"]
+       #print("description: " + description + "\n")
        value = subresult["value"]     
        lastchange = subresult["lastchange"]
+       #print("lastchange: " + lastchange + "\n")
        lastchange_epoch = lastchange.to_i
        lastchange_ts = DateTime.strptime(lastchange,'%s')
+       #print("lastchange_ts: " + lastchange_ts.to_s() + "\n")
   
        host = subresult["host"]
        comments = subresult["comments"]
        triggerid = subresult["triggerid"]
  
-       if lastchange_epoch > @past_epoch  #if the problem is within the polling period
+#       if lastchange_epoch > @past_epoch  #if the problem is within the polling period
           event = parse_event( description,lastchange_ts,host,comments,triggerid,value)
           events.push(event)
-       end
+#       end
     }
     
     return events
@@ -175,6 +189,7 @@ class BoundaryEvents
 
 # parse a Zabbix trigger object into a Boundary Events API object
   def parse_event(description,lastchange,host,comments,triggerid,value)
+    #print "parse_event()\n"
     severity = "ERROR"
     status = "OPEN"
  
@@ -207,6 +222,7 @@ class BoundaryEvents
   end
 
   def create_event(event)
+    #print "create_event()\n"
     auth = auth_encode("#{@boundary_apikey}:")
     headers = {"Authorization" => "Basic #{auth}", "Content-Type" => "application/json"}
     uri = URI("https://#{BOUNDARY_API_HOST}/#{@boundary_orgid}/events")
@@ -232,15 +248,17 @@ class BoundaryEvents
         end
       end
     rescue Timeout::Error
-      print "Timed out while attempting to create Boundary Event"
+      print "Timed out while attempting to create Boundary Event\n"
     end
   end
 
   def auth_encode(creds)
+    #print "auth_encode()\n"
     Base64.encode64(creds).strip.gsub("\n","")
   end
 
   def bad_response?(method, url, response)
+    #print "bad_response()\n"
     case response
     when Net::HTTPSuccess
       false
@@ -252,10 +270,13 @@ class BoundaryEvents
   end
 
   def report
+    #print "report()\n"
     auth_key = zabbix_login( zabbix_user_login_parse())
     events = zabbix_get_triggers(zabbix_get_triggers_parse(auth_key))
+    #print("CREATE EVENTS IN BOUNDARY\n")
     events.each do |event_body|
-      create_event(event_body)
+#      print("calling create_event: " + event_body.to_s())
+       create_event(event_body)
     end
   end
 
@@ -264,5 +285,6 @@ class BoundaryEvents
 end
 
 
+print "STARTING...\n"
 boundary_event = BoundaryEvents.new
 boundary_event.report
