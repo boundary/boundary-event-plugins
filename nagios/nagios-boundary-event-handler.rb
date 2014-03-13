@@ -25,6 +25,9 @@ require "optparse"
 require "uri"
 require "yaml"
 
+$stdout.reopen("#{File.dirname(__FILE__)}/boundary-out.txt", "w")
+$stderr.reopen("#{File.dirname(__FILE__)}/boundary-err.txt", "w")
+
 BOUNDARY_API_HOST = "api.boundary.com"
 BOUNDARY_CONFIG_PATH = "/etc/nagios3/boundary.yml"
 CACERT_PATH = "#{File.dirname(__FILE__)}/../common/cacert.pem"
