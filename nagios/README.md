@@ -28,12 +28,12 @@ Add the following commands to your Nagios instance:
 
     define command {
       command_name    handle_boundary_event_host
-      command_line    $USER1$/boundary-event-handler.rb -H $HOSTADDRESS$ -e host -s $HOSTSTATE$ -t $HOSTSTATETYPE$ -a $HOSTATTEMPT$ -o $LONGHOSTOUTPUT$
+      command_line    $USER1$/boundary-event-handler.rb -H $HOSTADDRESS$ -e host -s $HOSTSTATE$ -t $HOSTSTATETYPE$ -a $HOSTATTEMPT$ -o "$LONGHOSTOUTPUT$"
     }
 
     define command {
       command_name    handle_boundary_event_service
-      command_line    $USER1$/boundary-event-handler.rb -H $HOSTADDRESS$ -e service -s $SERVICESTATE$ -t $SERVICESTATETYPE$ -a $SERVICEATTEMPT$ -o $LONGSERVICEOUTPUT$
+      command_line    $USER1$/boundary-event-handler.rb -H $HOSTADDRESS$ -e service -s $SERVICESTATE$ -t $SERVICESTATETYPE$ -a $SERVICEATTEMPT$ -o "$LONGSERVICEOUTPUT$"
     }
 
 Add the following to your `nagios.cfg` (the first three lines may already exist):
