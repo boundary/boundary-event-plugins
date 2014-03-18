@@ -415,16 +415,16 @@ BOUNDARY_APIKEY = '<Your API Key Here>'
 BOUNDARY_HOST = "api.boundary.com"
 ZABBIX_USER = "Admin"
 ZABBIX_PASSWORD = "zabbix"
-ZABBIX_HOST = "192.168.128.130"
-LOGGING_LEVEL = Logger::WARN
-WINDOW = 60 * 60 * 24 * 7 # Query back the last seven days
+ZABBIX_API_HOST = "localhost" # Assume that this script is running on the Zabbix server
+LOGGING_LEVEL = Logger::INFO
+WINDOW = 60 * 60 * 24 * 2 # Query back the last two days
 
 # Create a new instance of a Boundary Event and invoke method to process events.
 boundary_event = BoundaryEvents.new(BOUNDARY_ORGID,
                                     BOUNDARY_APIKEY,
                                     ZABBIX_USER,
                                     ZABBIX_PASSWORD,
-                                    ZABBIX_HOST,
+                                    ZABBIX_API_HOST,
                                     BOUNDARY_HOST,
                                     LOGGING_LEVEL,
                                     WINDOW)
