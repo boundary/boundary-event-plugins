@@ -22,14 +22,18 @@ require 'net/https'
 require 'uri'
 require 'json'
 require 'httparty'
-require 'rsolr'
 require 'logger'
+require 'yaml'
+require 'optparse'
+require 'ostruct'
+require_relative 'options_parser'
 
 
 module TRIGGER_VALUE
   OK = 0
   PROBLEM = 1
 end
+
 
 #
 # Certificate
@@ -41,7 +45,16 @@ CACERT_PATH = "#{File.dirname(__FILE__)}/cacert.pem"
 #
 class BoundaryEvents
   
-  attr_reader :boundary_orgid, :boundary_apikey, :zabbix_user, :zabbix_password, :polling_window, :lastChangeSince
+  attr_reader :organizationID
+  attr_reader :apiKey
+  attr_reader :apiHost
+  attr_reader :apiHostTimeout
+  attr_reader :zabbixUser
+  attr_reader :zabbixPassword
+  attr_reader :zabbixHost
+  attr_reader :zabbixHostTimeout
+  attr_reader :pollingWindow
+  attr_reader :lastChangeSince
 
   # Public: Constructor for BoundaryEvent class
   #
@@ -52,6 +65,7 @@ class BoundaryEvents
   # apikey - Boundary API key.
   # user - User name to use for authorization against the Zabbix server
   # password - Password to user for authorization against the Zabbix server
+  # zabbixHost - Zabbix API host
   # apihost - Boundary API host, default to api.boundary.com
   # logginglevel - Logging level setting, defaults to Logger::WARN
   # window - How far back in time (in seconds) to query for the status of triggers within the Zabbix server
@@ -71,14 +85,46 @@ class BoundaryEvents
     @log = Logger.new(STDOUT)
     @log.level = logginglevel
     
-    @zabbixServerTimeout = 10
-    @boundaryServerTimeout = 10
+    @apiHostTimeout = 10
+    @zabbixHostTimeout = 10
 
     @lastChangeSince = (Time.now - @pollingWindow).to_i()
     
     @log.debug("lastChangeSince: #{@lastChangeSince}, #{Time.at(@lastChangeSince)}")
     
     @triggerCount = 0
+    
+    # Default location and name of configuration file
+    @configurationPath = "#{File.dirname(__FILE__)}/boundary.yml"
+
+  end
+  
+  def configure()
+    @organizationID = orgid
+    @apiKey = apikey
+    @apiHost = apihost
+    
+    @zabbixUser = user
+    @zabbixPassword = password
+    @zabbixHost = zabbixHost
+    
+    @pollingWindow = window
+    
+    # Configure our logger
+    @log = Logger.new(STDOUT)
+    @log.level = logginglevel
+    
+    @apiHostTimeout = 10
+    @zabbixHostTimeout = 10
+
+    @lastChangeSince = (Time.now - @pollingWindow).to_i()
+    
+    @log.debug("lastChangeSince: #{@lastChangeSince}, #{Time.at(@lastChangeSince)}")
+    
+    @triggerCount = 0
+    
+    # Default location and name of configuration file
+    @configurationPath = "#{File.dirname(__FILE__)}/boundary.yml"
 
   end
   
@@ -208,7 +254,7 @@ class BoundaryEvents
     auth_key = ""
     
     begin
-      timeout(@zabbixServerTimeout) do
+      timeout(@zabbixHostTimeout) do
       req = Net::HTTP::Post.new(uri.request_uri)
       req.body = auth_obj.to_json
         
@@ -335,7 +381,7 @@ class BoundaryEvents
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
     begin
-      timeout(@boundaryServerTimeout) do
+      timeout(@apiHostTimeout) do
         req = Net::HTTP::Post.new(uri.request_uri)
         req.body = event.to_json
 
@@ -405,7 +451,69 @@ class BoundaryEvents
     @log.info("Processed #{@triggerCount} trigger(s)")
   end
   
+  
 end
+
+def processOptions()
+  options = {}
+  
+  options[:config] = @defaultConfigPath
+  # orgid - Boundary organizational id.
+  # apikey - Boundary API key.
+  # user - User name to use for authorization against the Zabbix server
+  # password - Password to user for authorization against the Zabbix server
+  # apihost - Boundary API host, default to api.boundary.com
+  # logginglevel - Logging level setting, defaults to Logger::WARN
+    
+
+  options = OpenStruct.new
+  options.library = []
+  options.inplace = false
+  options.encoding = "utf8"
+  options.transfer_type = :auto
+  options.verbose = false
+
+  OptionParser.new do |opts|
+    opts.banner = "Usage: #{File.basename($0, File.extname($0))} [OPTIONS]"
+    opts.separator  ""
+    opts.separator  "Options"
+
+    opts.on("--api-host HOST", "Boundary API Host") do |h|
+      options[:apihost] = h
+      opts.library << lib
+    end
+#    opts.on("--config-path CONFIG", "Path to configuration file") { |c| options[:config] = c }
+#    opts.on("--api-key APIKEY", "Boundary API key") { |k| options[:apikey] = k }
+#    opts.on("--logging-level LEVEL", [:DEBUG,:INFO,:WARN,:ERROR,:FATAL], "Logging level") { |l| options[:logging_level] = l }
+#    opts.on("--org-id OUTPUT", "Boundary Organization ID") { |o| options[:orgid] = o }
+#    opts.on("--password PASSWORD", "Zabbix user password") { |p| options[:password] = p }
+#    opts.on("--user USER", "Zabbix user name") { |u| options[:user] = u }
+#    opts.on("--zabbix-host HOST","Zabbix API host") { |z| options[:zabbix_host] = z }
+
+#    opts.on_tail("-h", "--help", "Show this message") do
+#      puts opts
+#      exit
+#    end
+  
+    opts.parse!
+    case ARGV[0]
+    when "start"
+      puts "call start on options #{options.inspect}"
+    when "stop"
+      puts "call stop on options #{options.inspect}"
+    when "restart"
+      puts "call restart on options #{options.inspect}"
+    else
+      puts opts
+    end
+  end
+end
+
+#
+# Process command line options
+#
+options = OptionsParser.parse(ARGV)
+puts options
 
 #
 # Configuration values
