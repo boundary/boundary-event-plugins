@@ -71,9 +71,9 @@ def main():
         location = str(r.headers['Location'])
 
         #
-        # Extract the event ID
+        # Extract the event ID from the URI
         #
-        eventID = location.split('/',6)[5]
+        eventID = location.rsplit('/',1)[-1]
         print('eventId: ' + str(eventID))    
 
 if __name__ == '__main__':
