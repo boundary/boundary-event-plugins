@@ -410,8 +410,8 @@ end
 #
 # Configuration values
 #
-BOUNDARY_ORGID = "3ehRi7uZeeaTN12dErF5XOnRXjC"
-BOUNDARY_APIKEY = "ARI0PzUzWYUo7GG1OxiHmABTpr9"
+BOUNDARY_ORGID = '<Your Organization ID Here>'
+BOUNDARY_APIKEY = '<Your API Key Here>'
 BOUNDARY_HOST = "api.boundary.com"
 ZABBIX_USER = "Admin"
 ZABBIX_PASSWORD = "zabbix"
