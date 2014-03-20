@@ -39,9 +39,6 @@ class Options
 
       opts.separator ""
       opts.separator "Specific options:"
-      opts.on("-c","--config-path PATH", "Path to configuration file (default: config.yml") do |c|
-        options[:config_path] = c
-      end 
       opts.on("-l","--logging-level LEVEL", [:DEBUG,:INFO,:WARN,:ERROR,:FATAL], "Logging level DEBUG,INFO,WARN,ERROR,FATAL (default: INFO)") do |l|
         options[:logging_level] = l
       end
@@ -53,7 +50,7 @@ class Options
       opts.on("-k","--api-key APIKEY", "Boundary API key") do |k|
         options[:api_key] = k
       end
-      opts.on("-H","--api-host API_HOST", "Boundary API Host (default: api.boundary.com)") do |h|
+      opts.on("-H","--boundary-api-host API_HOST", "Boundary API Host (default: api.boundary.com)") do |h|
         options[:api_host] = h
       end
         
@@ -64,8 +61,8 @@ class Options
       opts.on("--zabbix-password PASSWORD", "Zabbix user password (default: zabbix)") do |p|
         options[zabbix_password] = p
       end
-      opts.on("--zabbix-host HOST","Zabbix API host (default: localhost)") do |z|
-        options[:zabbix_host] = z
+      opts.on("--zabbix-api-host HOST","Zabbix API host (default: localhost)") do |z|
+        options[:zabbix_api_host] = z
       end
       opts.separator ""
       opts.on_tail("-h", "--help", "Show this message") do
