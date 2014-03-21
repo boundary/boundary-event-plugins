@@ -14,29 +14,35 @@ Requirements
 Setup
 ---
 
-Install the handler script in your plugin directory.
+1) Install the handler script in your plugin directory.
 
-Add the config file `boundary.yml` to `/etc/nagios3/boundary.yml` (If you choose a different directory, you'll need to update the `BOUNDARY_CONFIG_PATH` variable in the script.) and ensure it has the following settings:
+2) Add the config file `boundary.yml` to `/etc/nagios3/boundary.yml` (If you choose a different directory, you'll need to update the `BOUNDARY_CONFIG_PATH` variable in the script.) and ensure it has the following settings:
 
 - sender: <the fqdn of your Nagios server as it would appear in Boundary>
 - apikey: <your Boundary api key>
 - orgid: <your Boundary orgid>
 
-Install the Boundary API SSL CA certificate somewhere and update the `CACERT_PATH` variable in the script to reflect this path.
+3) Install the Boundary API SSL CA certificate somewhere and update the `CACERT_PATH` variable in the script to reflect this path.
 
-Add the following commands to your Nagios instance:
+4) Verify that the nagios-boundary-event-handler.rb configuration is correct by creating a test event into boundary:
+
+$ nagios-boundary-event-handler.rb -H "MyHost" -e host -s OK -t HARD -a 1 -o Test
+
+Check the event console to ensure that an event is created.
+
+5) Add the following commands to your Nagios instance:
 
     define command {
       command_name    handle_boundary_event_host
-      command_line    $USER1$/boundary-event-handler.rb -H $HOSTADDRESS$ -e host -s $HOSTSTATE$ -t $HOSTSTATETYPE$ -a $HOSTATTEMPT$ -o "$LONGHOSTOUTPUT$"
+      command_line    $USER1$/nagios-boundary-event-handler.rb -H $HOSTADDRESS$ -e host -s $HOSTSTATE$ -t $HOSTSTATETYPE$ -a $HOSTATTEMPT$ -o "$LONGHOSTOUTPUT$"
     }
 
     define command {
       command_name    handle_boundary_event_service
-      command_line    $USER1$/boundary-event-handler.rb -H $HOSTADDRESS$ -e service -s $SERVICESTATE$ -t $SERVICESTATETYPE$ -a $SERVICEATTEMPT$ -o "$LONGSERVICEOUTPUT$"
+      command_line    $USER1$/nagios-boundary-event-handler.rb -H $HOSTADDRESS$ -e service -s $SERVICESTATE$ -t $SERVICESTATETYPE$ -a $SERVICEATTEMPT$ -o "$LONGSERVICEOUTPUT$"
     }
 
-Add the following to your `nagios.cfg` (the first three lines may already exist):
+6) Add the following to your `nagios.cfg` (the first three lines may already exist):
 
     log_event_handlers=1
     event_handler_timeout=30
@@ -44,7 +50,7 @@ Add the following to your `nagios.cfg` (the first three lines may already exist)
     global_host_event_handler=handle_boundary_event_host
     global_service_event_handler=handle_boundary_event_service
 
-Restart Nagios!
+7) Restart Nagios!
 
 For OMD implementations
 ---
