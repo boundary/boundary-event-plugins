@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>1.424</version>
+    </parent>
+    <artifactId>boundary-event</artifactId>
+    <packaging>hpi</packaging>
+    <version>0.2.1-SNAPSHOT</version>
+    <name>Jenkins Boundary Event Plugin</name>
+    <description>Creates Boundary Event for your build jobs</description>
+    <url>http://boundary.com</url>
+    <scm>
+        <connection>scm:git:git://github.com/boundary/jenkins-boundary-event-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:boundary/jenkins-boundary-event-plugin.git</developerConnection>
+        <url>https://github.com/boundary/jenkins-boundary-event-plugin</url>
+      <tag>HEAD</tag>
+  </scm>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.4.1</version>
+            </plugin>
+        </plugins>
+    </build>
+    <licenses>
+        <license>
+            <name>Apache 2 license</name>
+            <comments>All source code is under the Apache 2 license.</comments>
+        </license>
+    </licenses>
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+    </dependencies>
+    <distributionManagement>
+        <repository>
+            <id>maven.boundary.com</id>
+            <name>maven.boundary.com-releases</name>
+            <url>http://maven.boundary.com/artifactory/external</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.boundary.com</id>
+            <name>maven.boundary.com-snapshots</name>
+            <url>http://maven.boundary.com/artifactory/external</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>
