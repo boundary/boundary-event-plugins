@@ -19,10 +19,10 @@ How to Use
 - Fill-in Zabbix IP/hostname/address into variable ZABBIX_API_HOST
 - Fill in Zabbix username and password into ZABBIX_USER and ZABBIX_PASSWORD
 
-- Fill in Boundary APIKey and OrgID
-- Set polling period in seconds into POLLING_PERIOD - this should coincide with frequency of checking Zabbix for new alerts - recommended value = 60 seconds
+- Fill in BOUNDARY_ORGID and BOUNDARY_APIKEY
+- Set  window query parameter: WINDOW. This parameter controls how far back in time to query for triggers that have had their state changed
+- Set the logging level (default is INFO)
 
-2. Schedule the script 
 
-- crontab it to run at a frequency
-- Make sure the frequency matches the POLLING_PERIOD setting
+2. Schedule the script to run more frequenty then the WINDOW setting
+
