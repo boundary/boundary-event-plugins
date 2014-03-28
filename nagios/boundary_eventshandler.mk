@@ -2,7 +2,7 @@ extra_nagios_conf += r"""
 
 define command {
   command_name    handle_boundary_event_service
-  command_line    $USER2$/boundary-event-handler.rb -H $HOSTNAME$ -e service -s $SERVICESTATE$ -t $SERVICESTATETYPE$ -a $SERVICEATTEMPT$ -o "$SERVICEOUTPUT$" -d "$SERVICEDESC$"
+  command_line    $USER2$/nagios-boundary-event-handler.rb -H $HOSTNAME$ -e service -s $SERVICESTATE$ -t $SERVICESTATETYPE$ -a $SERVICEATTEMPT$ -o "$SERVICEOUTPUT$" -d "$SERVICEDESC$"
 }
 """
 
@@ -10,7 +10,7 @@ extra_nagios_conf += r"""
 
 define command {
   command_name    handle_boundary_event_host
-  command_line    $USER2$/boundary-event-handler.rb -H $HOSTADDRESS$ -e host -s $HOSTSTATE$ -t $HOSTSTATETYPE$ -a $HOSTATTEMPT$ -o $LONGHOSTOUTPUT$
+  command_line    $USER2$/nagios-boundary-event-handler.rb -H $HOSTADDRESS$ -e host -s $HOSTSTATE$ -t $HOSTSTATETYPE$ -a $HOSTATTEMPT$ -o $LONGHOSTOUTPUT$
 }
 """
 
