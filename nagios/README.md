@@ -1,4 +1,4 @@
-# Nagios Boundary Event Handler
+# Boundary Event Integration to Nagios
 
 ## Introduction
 
