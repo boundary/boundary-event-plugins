@@ -135,14 +135,14 @@ NOTE: The following assumes a standard default Nagios installation. The USER2 ma
 It assumed that the USER2 macro is defined as `/usr/local/nagios/libexec/eventhandlers`
 
 1. Edit the resource configuration file: ```$ vi /usr/local/nagios/etc/resource.cfg
-2. # Uncomment $USER2$ variable which points to /usr/local/nagios/libexec/eventhanders
+2. Uncomment $USER2$ variable which points to /usr/local/nagios/libexec/eventhanders
 
 #### Modify Nagios Event Handler Configuration
 1. View current configuration: ```$ egrep "(enable_event_handlers|event_handler_timeout|log_event_handlers)" /usr/local/nagios/etc/nagios.cfg```
 2. Edit the file, if needed, to set the appropriate values: ```$ vi /usr/local/nagios/etc/nagios.cfg```
-3. Set the value of `enable_event_handlers=1`
-4. Set the value of `event_handler_timeout=30`
-5. Set the value of `log_event_handlers=1`
+3. Set `enable_event_handlers=1`
+4. Set `event_handler_timeout=30`
+5. Set `log_event_handlers=1`
 6. Verify configuration: ```$ egrep "(enable_event_handlers|event_handler_timeout|log_event_handlers)" /usr/local/nagios/etc/nagios.cfg```
 
 #### Assign Global Host and Service Event Handlers
@@ -162,15 +162,15 @@ Following sections provide procedures for troubleshooting the Boundary Event Han
 ### Enable Logging of Command Execution
 To verify that nagios is calling the Boundary Event Handler script. Logging can be configured to show which commands are being executed by Nagios.
 
-1. Edit the Nagios configure file: ```$ vi /usr/local/nagios/etc/nagios.cfg
-2. Change the _logging_level_ to 256
-3. Change the _debug_verbosity_ to 2 and save the configuration
+1. Edit the Nagios configure file: ```$ vi /usr/local/nagios/etc/nagios.cfg```
+2. Set `logging_level=256`
+3. Set `debug_verbosity=2` and save the configuration file
 4. Verify values have been set correctly: ```$ egrep "(debug_level|debug_verbosity)" /usr/local/nagios/etc/nagios.cfg```
-5. To verify nagios configuration: ```$ /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg```
+5. Verify nagios configuration: ```$ /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg```
 6. Restart nagios (assuming nagios user has sudo access): ```sudo /etc/init.d/nagios start```
 
 ### Viewing Host or Service State Changes
-Nagios creates log entries when the global event handlers are executed. With logging enabled these can be observed in the `/usr/local/nagios/var/nagios.log`.
+Nagios creates log entries when the global event handlers are executed. With logging enabled these can be observed in the log file located here: `/usr/local/nagios/var/nagios.log`.
 
 1. Trace the global event handlers by the following command: ```$ tail -f /usr/local/nagios/var/nagios.log | egrep "(GLOBAL SERVICE EVENT HANDLER|GLOBAL HOST EVENT HANDLER)" *.log```
 
