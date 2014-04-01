@@ -29,8 +29,8 @@ Sections below describe the details of installing the Boundary Event Integration
 
 ### A Note on Nagios Installation File Layout and Permissions
 * A typical Nagios installation defines a unix user nagios and a unix group nagcmd to assign user and group file permissions.
-Other access is not usually enabled. The instructions that follow provide explicity commands to ensure that the owner
-and groups are set correctly, along with permssions. If you installation uses different user names and/or groups
+Other access is not usually enabled. The instructions that follow provide explicit commands to ensure that the owner
+and groups are set correctly, along with permssions. If your installation uses different user names and/or groups
 subsitute the appropriate values in the commands below.
 * The typical location to install Nagios in the file system is `/usr/local/nagios`. Should your installation be installed
 in another location please subsitute the correct path for `/usr/local/nagios` in the commands below.
