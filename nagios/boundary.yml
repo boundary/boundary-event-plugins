@@ -1,4 +1,4 @@
 ---
-sender: "somehost"
-apikey: "yourapikey"
-orgid: "yourorgid"
+sender: <HOSTNAME>
+apikey: <API KEY>
+orgid: <ORG ID>
