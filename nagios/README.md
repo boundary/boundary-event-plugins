@@ -71,7 +71,8 @@ Installing Ruby using RVM is a two step process that includes:
 4. Set the default ruby: ```rvm --default use 1.9.3```
 5. Verify that the correct version of Ruby is installed: ```$ ruby —-version```
 
-```ruby 1.9.3p545 (2014-02-24 revision 45159) [x86_64-linux]
+```
+ruby 1.9.3p545 (2014-02-24 revision 45159) [x86_64-linux]
 ```
 
 ### Installing the Integration
@@ -166,10 +167,9 @@ It assumed that the USER2 macro is defined as `/usr/local/nagios/libexec/eventha
 
 1. Edit the resource configuration file: ```$ vi /usr/local/nagios/etc/resource.cfg```.
 2. Uncomment $USER2$ variable which points to `/usr/local/nagios/libexec/eventhanders`.
-3. Verify: ```$ grep USER2 /usr/local/nagios/etc/resource.cfg```
+3. Verify: ```$ grep '$USER2$=' /usr/local/nagios/etc/resource.cfg```
 
 ```
-# Sets $USER2$ to be the path to event handlers
 $USER2$=/usr/local/nagios/libexec/eventhandlers
 ```
 
