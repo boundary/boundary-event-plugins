@@ -68,8 +68,9 @@ Installing Ruby using RVM is a two step process that includes:
 #### Installing Ruby
 1. Become the nagios user or the user underwhich the Nagios process runs
 3. Run the command: ```$ rvm install 1.9.3```
-4. Verify that the correct version of Ruby is installed: ```$ ruby —-version```
-5. Expected output should show version information similar to the following: ```ruby 1.9.3p545 (2014-02-24 revision 45159) [x86_64-linux]```
+4. Set the default ruby: ```rvm --default use 1.9.3```
+5. Verify that the correct version of Ruby is installed: ```$ ruby —-version```
+6. Expected output should show version information similar to the following: ```ruby 1.9.3p545 (2014-02-24 revision 45159) [x86_64-linux]```
 
 
 ### Installing the Integration
