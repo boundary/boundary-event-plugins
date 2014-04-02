@@ -220,5 +220,5 @@ To verify that nagios is calling the Boundary Event Handler script. Logging can 
 ### Viewing Host or Service State Changes
 Nagios creates log entries when the global event handlers are executed. With logging enabled these can be observed in the log file located here: `/usr/local/nagios/var/nagios.log`.
 
-1. Trace the global event handlers by the following command: ```$ tail -f /usr/local/nagios/var/nagios.log | egrep "(GLOBAL SERVICE EVENT HANDLER|GLOBAL HOST EVENT HANDLER)" *.log```
+1. Trace the global event handlers by the following command: ```$ tail -f /usr/local/nagios/var/nagios.log | egrep "(GLOBAL SERVICE EVENT HANDLER|GLOBAL HOST EVENT HANDLER)"```
 
