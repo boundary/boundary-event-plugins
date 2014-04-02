@@ -70,8 +70,9 @@ Installing Ruby using RVM is a two step process that includes:
 3. Run the command: ```$ rvm install 1.9.3```
 4. Set the default ruby: ```rvm --default use 1.9.3```
 5. Verify that the correct version of Ruby is installed: ```$ ruby —-version```
-6. Expected output should show version information similar to the following: ```ruby 1.9.3p545 (2014-02-24 revision 45159) [x86_64-linux]```
 
+```ruby 1.9.3p545 (2014-02-24 revision 45159) [x86_64-linux]
+```
 
 ### Installing the Integration
 Boundary's integration requires installing the following files in the Nagios installation:
@@ -106,7 +107,10 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 4. Set owner and group on the file: ```$ chown nagios:nagios /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 5. Set owner and group permissions on the file: ```$ chmod 0550 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 6. Verify ownership and permissions by running: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
-7. Output should resemble the following:```-r-xr-x--- 1 nagios nagios 5153 Mar 25 22:25 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
+
+```
+-r-xr-x--- 1 nagios nagios 5153 Mar 25 22:25 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb
+```
 
 #### Add Event Handler Script Configuration File
 1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/nagios```.
@@ -115,7 +119,10 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 4. Configure ownership: ```$ chown nagios:nagios /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
 5. Configure permissions: ```$ chmod 0440 /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
 6. Verify ownership and permissions: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
-7. Output should resemble the following: ```-rw-rw-r--. 1 nagios nagios 93 Apr  2 16:27 /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
+
+```
+-rw-rw-r--. 1 nagios nagios 93 Apr  2 16:27 /usr/local/nagios/libexec/eventhandlers/boundary.yml
+```
 
 #### Add Certificate
 1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/common```.
@@ -123,7 +130,10 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 3. Configure ownership: ```$ chown nagios:nagios /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
 4. Configure permissions:  ```$ chmod 0440 /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
 5. Verify ownership and permissions: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
-6. Output should resemble the following: ```-r--r-----. 1 nagios nagios 216563 Apr  2 16:32 /usr/local/nagios/libexec/eventhandlers/cacert.pem```
+
+```
+-r--r-----. 1 nagios nagios 216563 Apr  2 16:32 /usr/local/nagios/libexec/eventhandlers/cacert.pem
+```
 
 #### Verify Event Handler Script
 1. Run the following command: ```$ /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb -H "MyHost" -e host -s OK -t HARD -a 1 -o Test```
@@ -171,9 +181,21 @@ $USER2$=/usr/local/nagios/libexec/eventhandlers
 5. Set `log_event_handlers=1`
 6. Verify configuration: ```$ egrep "(enable_event_handlers|event_handler_timeout|log_event_handlers)" /usr/local/nagios/etc/nagios.cfg```
 
+```
+log_event_handlers=1
+event_handler_timeout=30
+enable_event_handlers=1
+```
+
 #### Assign Global Host and Service Event Handlers
 1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins/nagios```.
 2. Assign global host and service event handlers in Nagios installation: ```$ cat boundary_event_handlers_core.cfg >> /usr/local/nagios/etc/nagios.cfg```.
+3. Verify: ```$ tail -2 /usr/local/nagios/etc/nagios.cfg```
+
+```
+global_host_event_handler=handle_boundary_event_host
+global_service_event_handler=handle_boundary_event_service
+```
 
 #### Verify Nagios Configuration
 1. To verify nagios configuration: ```$ /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg```.
