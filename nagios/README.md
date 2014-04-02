@@ -110,7 +110,7 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 6. Verify ownership and permissions by running: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 
 ```
--r-xr-x--- 1 nagios nagios 5153 Mar 25 22:25 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb
+$ -r-xr-x--- 1 nagios nagios 5153 Mar 25 22:25 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb
 ```
 
 #### Add Event Handler Script Configuration File
@@ -122,7 +122,7 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 6. Verify ownership and permissions: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
 
 ```
--rw-rw-r--. 1 nagios nagios 93 Apr  2 16:27 /usr/local/nagios/libexec/eventhandlers/boundary.yml
+$ -rw-rw-r--. 1 nagios nagios 93 Apr  2 16:27 /usr/local/nagios/libexec/eventhandlers/boundary.yml
 ```
 
 #### Add Certificate
@@ -133,7 +133,7 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 5. Verify ownership and permissions: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
 
 ```
--r--r-----. 1 nagios nagios 216563 Apr  2 16:32 /usr/local/nagios/libexec/eventhandlers/cacert.pem
+$ -r--r-----. 1 nagios nagios 216563 Apr  2 16:32 /usr/local/nagios/libexec/eventhandlers/cacert.pem
 ```
 
 #### Verify Event Handler Script
@@ -170,7 +170,7 @@ It assumed that the USER2 macro is defined as `/usr/local/nagios/libexec/eventha
 3. Verify: ```$ grep '$USER2$=' /usr/local/nagios/etc/resource.cfg```
 
 ```
-$USER2$=/usr/local/nagios/libexec/eventhandlers
+$ $USER2$=/usr/local/nagios/libexec/eventhandlers
 ```
 
 #### Modify Nagios Event Handler Configuration
