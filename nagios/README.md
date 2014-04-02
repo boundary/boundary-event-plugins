@@ -36,7 +36,8 @@ subsitute the appropriate values in the commands below.
 in another location please subsitute the correct path for `/usr/local/nagios` in the commands below.
 
 ### Checking for Prerequisites
-Check to ensure that curl and unzip are installed on the Nagios system.
+Check to ensure that curl and unzip are installed on the Nagios system. These commands are required to complete
+the installation of the integration.
 
 #### curl 
 1. Become the nagios user or the user underwhich the Nagios process runs (typically `nagios`).
@@ -61,14 +62,14 @@ Installing Ruby using RVM is a two step process that includes:
 
 #### Installing RVM
 1. Become the nagios user or the user underwhich the Nagios process runs (typically `nagios`).
-2. Run the following command: ```$ \curl -sSL https://get.rvm.io | bash -s stable```
+2. Run the following command: ```$ curl -sSL https://get.rvm.io | bash -s stable```
 3. Include the RVM environment: ```$ source /home/nagios/.rvm/scripts/rvm```
 
 #### Installing Ruby
 1. Become the nagios user or the user underwhich the Nagios process runs
 3. Run the command: ```$ rvm install 1.9.3```
 4. Verify that the correct version of Ruby is installed: ```$ ruby —-version```
-5. Expected output show the version information similar to the following: ```ruby 1.9.3p545 (2014-02-24 revision 45159) [x86_64-linux]```
+5. Expected output should show version information similar to the following: ```ruby 1.9.3p545 (2014-02-24 revision 45159) [x86_64-linux]```
 
 
 ### Installing the Integration
@@ -98,27 +99,27 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 
 #### Add Event Handler Script
 
-1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins/nagios```.
+1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/nagios```.
 2. Ensure that eventhandlers directory exists: ```$ mkdir -p /usr/local/nagios/libexec/eventhandlers```.
 3. Copy the Boundary event handling script to Nagios installation: ```$ cp nagios-boundary-event-handler.rb /usr/local/nagios/libexec/eventhandlers/```.
-4. Set owner and group on the file: ```$ sudo chown nagios:nagcmd /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rbi```.
-5. Set owner and group permissions on the file: ```$ sudo chmod 0550 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
+4. Set owner and group on the file: ```$ chown nagios:nagcmd /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rbi```.
+5. Set owner and group permissions on the file: ```$ chmod 0550 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 6. Verify ownership and permissions by running: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 7. Output should resemble the following:```-r-xr-x--- 1 nagios nagios 5153 Mar 25 22:25 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 
 #### Add Event Handler Script Configuration File
-1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins/nagios```.
+1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/nagios```.
 2. Edit the configuration file by adding source (typically the Nagios host), Boundary API Key and Organization ID. : ```$ vi boundary.yml```
-3. Copy the Boundary event handling script to Nagios installation: ```$ cp boundary.yml /usr/local/nagios/etc/boundary.yml```.
-4. Configure ownership: ```$ chown nagios:nagcmd /usr/local/nagios/etc/boundary.yml```.
-5. Configure permissions:  ```$ chmod 0440 /usr/local/nagios/etc/boundary.yml```.
+3. Copy the Boundary event handling script to Nagios installation: ```$ cp boundary.yml /usr/local/nagios/libexec/eventhandlers```.
+4. Configure ownership: ```$ chown nagios:nagcmd /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
+5. Configure permissions:  ```$ chmod 0440 /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
 
 #### Add Certificate
-1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins/common```.
+1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/common```.
 2. Copy the Boundary certificate to Nagios installation: ```$ cp  cacert.pem /usr/local/nagios/libexec/eventhandlers/```.
-3. Configure ownership: ```$ chown nagios:nagcmd /usr/local/nagios/libexec/eventhandlers/cacert.pm```.
-4. Configure permissions:  ```$ chmod 0440 /usr/local/nagios/libexec/eventhandlers/cacert.pm```.
-5. Verify ownership and permissions: ```$ ls -l /usr/local/nagios/etc/boundary.yml
+3. Configure ownership: ```$ chown nagios:nagcmd /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
+4. Configure permissions:  ```$ chmod 0440 /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
+5. Verify ownership and permissions: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
 
 #### Verify Event Handler Script
 1. Run the following command: ```$ /usr/local/nagios/libexec/eventhandler/nagios-boundary-event-handler.rb -H "MyHost" -e host -s OK -t HARD -a 1 -o Test```
