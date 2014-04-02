@@ -29,7 +29,7 @@ $stdout.reopen("#{File.dirname(__FILE__)}/boundary-out.txt", "w")
 $stderr.reopen("#{File.dirname(__FILE__)}/boundary-err.txt", "w")
 
 BOUNDARY_API_HOST = "api.boundary.com"
-BOUNDARY_CONFIG_PATH = "/usr/local/nagios/etc"
+BOUNDARY_CONFIG_PATH = "#{File.dirname(__FILE__)}/boundary.yml"
 CACERT_PATH = "#{File.dirname(__FILE__)}/cacert.pem"
 
 def load_config(path)
