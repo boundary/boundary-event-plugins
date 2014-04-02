@@ -28,7 +28,7 @@ regarding these states can be found online at http://www.nagios.org/documentatio
 Sections below describe the details of installing the Boundary Event Integration to Nagios.
 
 ### A Note on Nagios Installation File Layout and Permissions
-* A typical Nagios installation defines a unix user nagios and a unix group nagcmd to assign user and group file permissions.
+* A typical Nagios installation defines a unix user nagios and a unix group nagios to assign user and group file permissions.
 Other access is not usually enabled. The instructions that follow provide explicit commands to ensure that the owner
 and groups are set correctly, along with permssions. If your installation uses different user names and/or groups
 subsitute the appropriate values in the commands below.
@@ -112,32 +112,56 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/nagios```.
 2. Edit the configuration file by adding source (typically the Nagios host), Boundary API Key and Organization ID. : ```$ vi boundary.yml```
 3. Copy the Boundary event handling script to Nagios installation: ```$ cp boundary.yml /usr/local/nagios/libexec/eventhandlers```.
-4. Configure ownership: ```$ chown nagios:nagcmd /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
-5. Configure permissions:  ```$ chmod 0440 /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
+4. Configure ownership: ```$ chown nagios:nagios /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
+5. Configure permissions: ```$ chmod 0440 /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
+6. Verify ownership and permissions: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
+7. Output should resemble the following: ```-rw-rw-r--. 1 nagios nagios 93 Apr  2 16:27 /usr/local/nagios/libexec/eventhandlers/boundary.yml```.
 
 #### Add Certificate
 1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/common```.
 2. Copy the Boundary certificate to Nagios installation: ```$ cp  cacert.pem /usr/local/nagios/libexec/eventhandlers/```.
-3. Configure ownership: ```$ chown nagios:nagcmd /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
+3. Configure ownership: ```$ chown nagios:nagios /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
 4. Configure permissions:  ```$ chmod 0440 /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
 5. Verify ownership and permissions: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/cacert.pem```.
+6. Output should resemble the following: ```-r--r-----. 1 nagios nagios 216563 Apr  2 16:32 /usr/local/nagios/libexec/eventhandlers/cacert.pem```
 
 #### Verify Event Handler Script
-1. Run the following command: ```$ /usr/local/nagios/libexec/eventhandler/nagios-boundary-event-handler.rb -H "MyHost" -e host -s OK -t HARD -a 1 -o Test```
-2. Verify that script executed succesfully: ```$ cat /usr/local/nagios/libexec/eventhandler/boundary-out.txt```
+1. Run the following command: ```$ /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb -H "MyHost" -e host -s OK -t HARD -a 1 -o Test```
+2. Verify that script executed succesfully: ```$ cat /usr/local/nagios/libexec/eventhandlers/boundary-out.txt```
 3. Output in file should contain something similar to this: ```Created a Boundary Event @ NNNNNNNNN```
 4. Check the Boundary Event Console to ensure that an event with the same event id has been created or exists.
+5. If an event is not created then check for any errors: ```$ cat /usr/local/nagios/libexec/eventhandlers/boundary-err.txt```
 
 #### Add Nagios Event Handler Command Definitions
-1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins/nagios```.
+1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/nagios```.
 2. Append the Boundary Command Definitions to the Nagios installation: ```$ cat boundary_command_definitions_core.cfg >> /usr/local/nagios/etc/objects/commands.cfg```.
+3. Verify configuration was added: ```$ tail -10 /usr/local/nagios/etc/objects/commands.cfg```
+
+```
+define command {
+  command_name    handle_boundary_event_host
+  command_line    $USER2$/nagios-boundary-event-handler.rb -H $HOSTADDRESS$ -e host -s $HOSTSTATE$ -t $HOSTSTATETYPE$ -a $HOSTATTEMPT$ -o "$LONGHOSTOUTPUT$"
+}
+
+define command {
+  command_name    handle_boundary_event_service
+  command_line    $USER2$/nagios-boundary-event-handler.rb -H $HOSTADDRESS$ -e service -s $SERVICESTATE$ -t $SERVICESTATETYPE$ -a $SERVICEATTEMPT$ -o "$LONGSERVICEOUTPUT$"
+}
+
+```
 
 #### Enable USER2 Macro
 NOTE: The following assumes a standard default Nagios installation. The USER2 macro is used by the commands that call the Boundary Event Handler script.
 It assumed that the USER2 macro is defined as `/usr/local/nagios/libexec/eventhandlers`
 
-1. Edit the resource configuration file: ```$ vi /usr/local/nagios/etc/resource.cfg
-2. Uncomment $USER2$ variable which points to /usr/local/nagios/libexec/eventhanders
+1. Edit the resource configuration file: ```$ vi /usr/local/nagios/etc/resource.cfg```.
+2. Uncomment $USER2$ variable which points to `/usr/local/nagios/libexec/eventhanders`.
+3. Verify: ```$ grep USER2 /usr/local/nagios/etc/resource.cfg```
+
+```
+# Sets $USER2$ to be the path to event handlers
+$USER2$=/usr/local/nagios/libexec/eventhandlers
+```
 
 #### Modify Nagios Event Handler Configuration
 1. View current configuration: ```$ egrep "(enable_event_handlers|event_handler_timeout|log_event_handlers)" /usr/local/nagios/etc/nagios.cfg```
