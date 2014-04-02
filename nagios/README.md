@@ -63,7 +63,7 @@ Installing Ruby using RVM is a two step process that includes:
 #### Installing RVM
 1. Become the nagios user or the user underwhich the Nagios process runs (typically `nagios`).
 2. Run the following command: ```$ curl -sSL https://get.rvm.io | bash -s stable```
-3. Include the RVM environment: ```$ source /home/nagios/.rvm/scripts/rvm```
+3. Include the RVM environment: ```$ source ~/.bash_profile```
 
 #### Installing Ruby
 1. Become the nagios user or the user underwhich the Nagios process runs
@@ -80,12 +80,12 @@ Boundary's integration requires installing the following files in the Nagios ins
 2. Event handler script configuration file
 3. Certificate used by event handler script
 
-Additionally configuration files in the Nagios installation are required to be modified, which requires that Nagios be restarted:
+Additionally configuration files in the Nagios installation are require modification, which in turn requires that Nagios be restarted:
 
 1. Define event handler commands
 2. Enable event handlers
 3. Enable logging of event handlers
-4. Set Event Handler timeout
+4. Set event handler timeout
 5. Assign global host and service event handlers
 
 NOTE: All of the following procedures should be performed as the nagios user or the user underwhich the Nagios process runs
@@ -103,7 +103,7 @@ NOTE: All of the following procedures should be performed as the nagios user or 
 1. Change directory to the Nagios integration: ```$ cd ~/boundary-event-plugins-master/nagios```.
 2. Ensure that eventhandlers directory exists: ```$ mkdir -p /usr/local/nagios/libexec/eventhandlers```.
 3. Copy the Boundary event handling script to Nagios installation: ```$ cp nagios-boundary-event-handler.rb /usr/local/nagios/libexec/eventhandlers/```.
-4. Set owner and group on the file: ```$ chown nagios:nagcmd /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rbi```.
+4. Set owner and group on the file: ```$ chown nagios:nagios /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 5. Set owner and group permissions on the file: ```$ chmod 0550 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 6. Verify ownership and permissions by running: ```$ ls -l /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
 7. Output should resemble the following:```-r-xr-x--- 1 nagios nagios 5153 Mar 25 22:25 /usr/local/nagios/libexec/eventhandlers/nagios-boundary-event-handler.rb```.
