@@ -161,6 +161,10 @@ define command {
 
 ```
 
+**NOTE:** For OMD implementations
+
+The boundary_eventhandlers.mk file should be placed in the $OMD_ROOT/etc/check_mk/conf.d directory and will be applied to the managed Nagios instance once OMD is restarted.
+
 #### Enable USER2 Macro
 NOTE: The following assumes a standard default Nagios installation. The USER2 macro is used by the commands that call the Boundary Event Handler script.
 It assumed that the USER2 macro is defined as `/usr/local/nagios/libexec/eventhandlers`
