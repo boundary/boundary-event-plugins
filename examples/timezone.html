@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>What time zone is my browser configured for?</title>
+</head>
+<body>
+<script language="javascript">
+ourDate = new Date();
+document.write("The time and date at your computer's location is: " + ourDate.toLocaleString() + ".<br/>");
+document.write("The time zone offset between local time and GMT is " + ourDate.getTimezoneOffset() + " minutes.<br/>");
+document.write("The time and date (GMT) is: " + ourDate.toGMTString() + ".<br/>");
+</script>
+</body>
+</html>
+
