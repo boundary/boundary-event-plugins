@@ -97,7 +97,7 @@ class BoundaryEvents < Chef::Handler
     uri = URI("https://api.boundary.com/#{@boundary_orgid}/events")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    http.ca_file = "#{File.dirname(__FILE__)}/cacert.pem"
+    http.ca_file = "#{File.dirname(__FILE__)}/boundary-cacert.pem"
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
     begin

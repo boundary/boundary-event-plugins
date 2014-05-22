@@ -23,6 +23,13 @@ cookbook_file "#{Chef::Config[:file_cache_path]}/chef-boundary-events-handler.rb
   mode "0600"
 end
 
+cookbook_file "#{Chef::Config['file_cache_path']}/boundary-cacert.pem" do
+  source 'cacert.pem'
+  owner 'root'
+  group 'root'
+  mode '0600'
+end
+
 chef_handler "BoundaryEvents" do
   source "#{Chef::Config[:file_cache_path]}/chef-boundary-events-handler.rb"
   arguments [
