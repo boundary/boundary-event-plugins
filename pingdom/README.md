@@ -5,7 +5,7 @@ Pingdom Boundary Events Handler
 - Posts these checks out to Boundary Events Console
 
 Configuration:
-- Be sure to have the cacert.pem file, this is required for encryption.
+- Be sure to have the cacert.pem file located here: [cacert.pem] (https://github.com/boundary/boundary-event-plugins/tree/master/common), this is required for encryption.
 - Edit Boundary variables BOUNDARY_ORGID and BOUNDARY_APIKEY
       - These can be found in Boundary under Configure > Organization
 - Edit Pingdom variables PINGDOM_USERNAME, PINGDOM_PASSWORD, and PINGDOM_APPKEY
