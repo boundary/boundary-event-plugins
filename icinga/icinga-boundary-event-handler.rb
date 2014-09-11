@@ -25,6 +25,9 @@ require "optparse"
 require "uri"
 require "yaml"
 
+$stdout.reopen("#{File.dirname(__FILE__)}/boundary-out.txt", "w")
+$stderr.reopen("#{File.dirname(__FILE__)}/boundary-err.txt", "w")
+
 BOUNDARY_API_HOST = "api.boundary.com"
 BOUNDARY_CONFIG_PATH = "/etc/icinga/boundary.yml"
 CACERT_PATH = "#{File.dirname(__FILE__)}/../common/cacert.pem"
@@ -55,8 +58,8 @@ class BoundaryEvent
     @data = {
       :title => "Icinga #{data[:event_type].to_s} event",
       :tags => ["icinga"],
-      :status => ok_states.include?(data[:state]) ? "CLOSED" : "OPEN",
-      :severity => ok_states.include?(data[:state_type]) ? "ERROR" : "INFO" : "WARN" : "CRITICAL",
+      :status => "OPEN",
+      :severity => data[:state],
       :message => data[:output].split("\n")[0],
       :properties => {
         :eventKey => "icinga-check",
@@ -155,13 +158,6 @@ OptionParser.new do |opts|
     else
       options[:description] = nil
     end
-
-    if options[:state_type] == "WARNING"
-      options[:state_type] = "WARN"
-    elsif options[:state_type] == "UNKNOWN"
-      options[:state_type] = "INFO"
-    end
-
   rescue OptionParser::ParseError
     $stderr.print "Error: #{$!}\n"
 
